@@ -511,6 +511,34 @@ Verification:
 - Form button visibility and delete confirmation strictly match `$swift` rules.
 ```
 
+### Task 6.4 - Settings UI/UX and design implementation (staging-ready)
+Planned commit subject:
+`feat(settings-ui): complete settings ux and visual design for staging readiness`
+
+Post-completion commit body:
+```text
+Files changed:
+- <settings view files>
+- <settings component files>
+- <theme files>
+- plan.md
+
+Completed:
+- Applied Settings feature UI/UX and visual design rules to all Stage 6 screens.
+- Ensured non-default, clean-cut, intuitive visual hierarchy across Settings root and child routes.
+- Added/updated reusable Components for complex body sections to keep views maintainable.
+- Ensured permission-dependent views present explicit unavailable/denied states with next actions.
+- Ensured editable forms in Settings routes follow `$swift` save/reset/delete + delete confirmation behavior.
+- Ensured loading, empty, and error states are explicit, actionable, and visually consistent.
+- Ensured all async UI actions are Task-driven in Views with cancellation guards where side effects can occur.
+- Completed rule-by-rule `$swift` compliance check for Stage 6 deliverables.
+
+Verification:
+- Manual QA pass for Settings flows: goal, reminders, permissions, units, data management.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
+- Stage 6 marked staging-ready only after design + UX + behavior checks all pass.
+```
+
 ---
 
 ## Stage 7 - Polish, Validation, and Handoff
