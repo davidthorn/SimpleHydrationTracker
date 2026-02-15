@@ -73,6 +73,7 @@ internal struct GoalSetupView: View {
                         showDeleteConfirmation = true
                     }
                     .disabled(isDeleting)
+                    .accessibilityHint("Removes your saved daily goal.")
                 }
             }
         }
@@ -110,7 +111,7 @@ internal struct GoalSetupView: View {
                 }
             }
         }
-        .alert("Are you sure you want to delete this?", isPresented: $showDeleteConfirmation) {
+        .alert("Delete Daily Goal?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Delete", role: .destructive) {
                 Task {
@@ -134,6 +135,8 @@ internal struct GoalSetupView: View {
                     }
                 }
             }
+        } message: {
+            Text("Your goal will be removed and progress targets will reset.")
         }
     }
 }

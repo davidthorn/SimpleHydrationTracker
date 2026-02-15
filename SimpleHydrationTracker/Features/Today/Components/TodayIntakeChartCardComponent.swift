@@ -36,6 +36,8 @@ internal struct TodayIntakeChartCardComponent: View {
                     )
                     .foregroundStyle(AppTheme.accent.gradient)
                     .cornerRadius(5)
+                    .accessibilityLabel(point.hourStart.formatted(date: .omitted, time: .shortened))
+                    .accessibilityValue(selectedUnit.format(milliliters: point.totalMilliliters))
                 }
                 .frame(height: 180)
                 .chartXScale(domain: chartDomain)
@@ -49,6 +51,9 @@ internal struct TodayIntakeChartCardComponent: View {
                 .chartYAxis {
                     AxisMarks(position: .leading)
                 }
+                .accessibilityLabel("Today intake chart")
+                .accessibilityValue(chartAccessibilityValue)
+                .accessibilityHint("Displays hydration intake over time with adaptive time buckets.")
             }
         }
         .padding(16)
@@ -92,6 +97,22 @@ internal struct TodayIntakeChartCardComponent: View {
         case .hourly:
             return 120
         }
+    }
+
+    private var chartAccessibilityValue: String {
+        let scaleText: String
+        switch chartData.scale {
+        case .fiveMinutes:
+            scaleText = "5-minute buckets"
+        case .fifteenMinutes:
+            scaleText = "15-minute buckets"
+        case .thirtyMinutes:
+            scaleText = "30-minute buckets"
+        case .hourly:
+            scaleText = "hourly buckets"
+        }
+
+        return "\(chartData.points.count) bars, using \(scaleText)."
     }
 }
 

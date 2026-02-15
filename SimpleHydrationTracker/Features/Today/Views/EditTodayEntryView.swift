@@ -83,6 +83,7 @@ internal struct EditTodayEntryView: View {
                         showDeleteConfirmation = true
                     }
                     .disabled(isDeleting)
+                    .accessibilityHint("Permanently deletes this hydration entry.")
                 }
             }
         }
@@ -114,7 +115,7 @@ internal struct EditTodayEntryView: View {
                 }
             }
         }
-        .alert("Are you sure you want to delete this?", isPresented: $showDeleteConfirmation) {
+        .alert("Delete This Entry?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Delete", role: .destructive) {
                 Task {
@@ -138,6 +139,8 @@ internal struct EditTodayEntryView: View {
                     }
                 }
             }
+        } message: {
+            Text("This entry will be permanently removed from your hydration history.")
         }
         .task {
             guard Task.isCancelled == false else {

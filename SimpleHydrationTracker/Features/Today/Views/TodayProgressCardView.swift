@@ -59,6 +59,10 @@ internal struct TodayProgressCardView: View {
                         .stroke(progressTint.opacity(0.2), lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Today's hydration progress")
+        .accessibilityValue(progressAccessibilityValue)
+        .accessibilityHint("Shows consumed, goal, and remaining intake for today.")
     }
 
     private var progressLabel: String {
@@ -90,6 +94,13 @@ internal struct TodayProgressCardView: View {
 
     private var progressTint: Color {
         progress >= 1 ? AppTheme.success : AppTheme.accent
+    }
+
+    private var progressAccessibilityValue: String {
+        let consumed = selectedUnit.format(milliliters: consumedMilliliters)
+        let goal = goalText
+        let remaining = selectedUnit.format(milliliters: remainingMilliliters)
+        return "\(progressLabel). Consumed \(consumed). Goal \(goal). Remaining \(remaining)."
     }
 }
 

@@ -36,6 +36,7 @@ internal struct TodayRouteLinksSectionView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("today.route.addCustomAmount")
 
             if let latestEntryID {
                 NavigationLink(value: TodayRoute.editTodayEntry(entryID: latestEntryID)) {
@@ -47,6 +48,7 @@ internal struct TodayRouteLinksSectionView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("today.route.editLatestEntry")
             } else {
                 TodayRouteRowComponent(
                     title: "Edit Latest Entry",
@@ -55,6 +57,7 @@ internal struct TodayRouteLinksSectionView: View {
                     tint: AppTheme.warning,
                     isEnabled: false
                 )
+                .accessibilityIdentifier("today.route.editLatestEntry.disabled")
             }
 
             NavigationLink(value: TodayRoute.dayDetail(dayID: currentDayID)) {
@@ -66,6 +69,7 @@ internal struct TodayRouteLinksSectionView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("today.route.dayDetail")
 
             NavigationLink(value: TodayRoute.goalSetup) {
                 TodayRouteRowComponent(
@@ -76,6 +80,7 @@ internal struct TodayRouteLinksSectionView: View {
                 )
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("today.route.goalSetup")
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)

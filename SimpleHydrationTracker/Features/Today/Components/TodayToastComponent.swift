@@ -35,6 +35,9 @@ internal struct TodayToastComponent: View {
                 )
                 .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 4)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Confirmation")
+        .accessibilityValue(message)
     }
 }
 

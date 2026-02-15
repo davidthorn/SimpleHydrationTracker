@@ -714,15 +714,26 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <today view/component files>
+- SimpleHydrationTracker/Features/Today/Views/TodayQuickAddSectionView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayProgressCardView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayRouteLinksSectionView.swift
+- SimpleHydrationTracker/Features/Today/Views/EditTodayEntryView.swift
+- SimpleHydrationTracker/Features/Today/Views/GoalSetupView.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayIntakeChartCardComponent.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayRouteRowComponent.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayDayEntryRowComponent.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayToastComponent.swift
+- plan.md
 
 Completed:
-- Added/updated accessibility labels, values, and hints for primary Today controls.
-- Refined destructive and high-impact action confirmations/messages.
-- Improved tap target clarity and state feedback for async actions.
+- Added explicit accessibility labels, values, and hints for quick-add controls, progress summary, day rows, route rows, and intake chart bars.
+- Added accessibility identifiers for Today route links to improve UI-test targeting and disabled-state validation.
+- Improved confirmation semantics for destructive Today actions with clearer delete titles/messages and explicit button hints.
+- Kept quick-add success feedback accessible through the toast component while maintaining iOS 17.6-compatible modifiers.
 
 Verification:
-- Manual accessibility check for key Today interactions.
+- Manual VoiceOver-oriented pass for key Today interactions (quick add, route links, day entry rows, progress summary, chart).
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
 ### Task 7.3 - TodayScene staging validation

@@ -65,6 +65,8 @@ internal struct TodayQuickAddSectionView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Quick add \(selectedUnit.format(milliliters: amount.milliliters))")
+                    .accessibilityHint("Adds hydration instantly to today's total.")
                     .accessibilityIdentifier("today.quickAdd.\(amount.milliliters)")
                 }
             }

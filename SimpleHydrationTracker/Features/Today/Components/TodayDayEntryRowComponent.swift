@@ -44,6 +44,10 @@ internal struct TodayDayEntryRowComponent: View {
                         .stroke(Color.black.opacity(0.05), lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Hydration entry")
+        .accessibilityValue("\(selectedUnit.format(milliliters: entry.amountMilliliters)), \(entry.consumedAt.formatted(date: .abbreviated, time: .shortened))")
+        .accessibilityHint("Opens entry details.")
     }
 }
 

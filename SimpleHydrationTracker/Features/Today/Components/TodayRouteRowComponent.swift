@@ -53,6 +53,7 @@ internal struct TodayRouteRowComponent: View {
             Image(systemName: "chevron.right")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
         }
         .padding(12)
         .background(
@@ -64,6 +65,10 @@ internal struct TodayRouteRowComponent: View {
                 )
         )
         .opacity(isEnabled ? 1 : 0.7)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue(subtitle)
+        .accessibilityHint(isEnabled ? "Opens this route." : "Unavailable.")
     }
 }
 
