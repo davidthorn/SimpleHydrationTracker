@@ -11,8 +11,14 @@ import SwiftUI
 
 internal struct TodayView: View {
     @StateObject private var viewModel: TodayViewModel
+    @State private var quickAddErrorMessage: String?
+    private let quickAddOptions: [QuickAddAmount]
 
-    internal init(serviceContainer: ServiceContainerProtocol) {
+    internal init(
+        serviceContainer: ServiceContainerProtocol,
+        quickAddOptions: [QuickAddAmount] = QuickAddAmount.allCases
+    ) {
+        self.quickAddOptions = quickAddOptions
         let vm = TodayViewModel(
             hydrationStore: serviceContainer.hydrationStore,
             goalStore: serviceContainer.goalStore
@@ -21,34 +27,42 @@ internal struct TodayView: View {
     }
 
     internal var body: some View {
-        List {
-            Section("Today Summary") {
-                Text("Consumed: \(viewModel.state.consumedMilliliters) ml")
-                Text("Goal: \(viewModel.state.goalMilliliters) ml")
-                Text("Remaining: \(viewModel.state.remainingMilliliters) ml")
-                Text("Progress: \(Int(viewModel.state.progress * 100))%")
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                TodayProgressCardView(
+                    consumedMilliliters: viewModel.state.consumedMilliliters,
+                    goalMilliliters: viewModel.state.goalMilliliters,
+                    remainingMilliliters: viewModel.state.remainingMilliliters,
+                    progress: viewModel.state.progress
+                )
+
+                TodayQuickAddSectionView(quickAddOptions: quickAddOptions) { amount in
+                    Task {
+                        guard Task.isCancelled == false else {
+                            return
+                        }
+
+                        do {
+                            try await viewModel.addQuickAmount(amount)
+                        } catch {
+                            guard Task.isCancelled == false else {
+                                return
+                            }
+                            quickAddErrorMessage = "Unable to add hydration right now."
+                        }
+                    }
+                }
+
                 if let errorMessage = viewModel.state.errorMessage {
                     Text(errorMessage)
                         .foregroundStyle(.red)
+                        .font(.footnote)
                 }
-            }
 
-            NavigationLink(value: TodayRoute.addCustomAmount) {
-                Text("Add Custom Amount")
+                TodayRouteLinksSectionView()
             }
-            NavigationLink(
-                value: TodayRoute.editTodayEntry(entryID: HydrationEntryIdentifier(value: UUID()))
-            ) {
-                Text("Edit Today Entry")
-            }
-            NavigationLink(
-                value: TodayRoute.dayDetail(dayID: HydrationDayIdentifier(value: Date()))
-            ) {
-                Text("Day Detail")
-            }
-            NavigationLink(value: TodayRoute.goalSetup) {
-                Text("Goal Setup")
-            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
         }
         .navigationTitle("Today")
         .task {
@@ -57,6 +71,24 @@ internal struct TodayView: View {
             }
             await viewModel.start()
         }
+        .alert("Unable to Add Water", isPresented: quickAddErrorAlertBinding) {
+            Button("OK", role: .cancel) {
+                quickAddErrorMessage = nil
+            }
+        } message: {
+            Text(quickAddErrorMessage ?? "")
+        }
+    }
+
+    private var quickAddErrorAlertBinding: Binding<Bool> {
+        Binding(
+            get: { quickAddErrorMessage != nil },
+            set: { isPresented in
+                if isPresented == false {
+                    quickAddErrorMessage = nil
+                }
+            }
+        )
     }
 }
 

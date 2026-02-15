@@ -268,17 +268,25 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <today view files>
-- <today components files>
+- Models/QuickAddAmount.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/TodayViewModel.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayProgressCardView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayQuickAddSectionView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayRouteLinksSectionView.swift
+- SimpleHydrationTracker/Components/TodayRouteRowComponent.swift
 
 Completed:
 - Added custom-styled Today UI with progress hero and quick-add actions.
+- Replaced raw `Int` quick-add options with shared `QuickAddAmount` enum in `Models`.
 - Added Task-based button actions with cancellation guard checks.
 - Added user-visible error presentation for Today logging failures.
+- Extracted reusable Today route row into a dedicated component.
 
 Verification:
 - Quick-add updates progress and persists entries.
 - Logging failures are surfaced to user with actionable messaging.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
 ### Task 4.3 - Today child routes implementation

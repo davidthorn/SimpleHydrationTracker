@@ -64,6 +64,17 @@ internal final class TodayViewModel: ObservableObject {
         }
     }
 
+    internal func addQuickAmount(_ quickAddAmount: QuickAddAmount) async throws {
+        let entry = HydrationEntry(
+            id: UUID(),
+            amountMilliliters: quickAddAmount.milliliters,
+            consumedAt: nowProvider(),
+            source: .quickAdd
+        )
+
+        try await hydrationStore.upsertEntry(entry)
+    }
+
     private func refreshSummary(entries: [HydrationEntry]) async throws {
         let now = nowProvider()
         let todaysEntries = entries.filter { entry in
