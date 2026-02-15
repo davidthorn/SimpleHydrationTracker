@@ -20,8 +20,8 @@ internal struct TodayView: View {
     ) {
         self.quickAddOptions = quickAddOptions
         let vm = TodayViewModel(
-            hydrationStore: serviceContainer.hydrationStore,
-            goalStore: serviceContainer.goalStore
+            hydrationService: serviceContainer.hydrationService,
+            goalService: serviceContainer.goalService
         )
         _viewModel = StateObject(wrappedValue: vm)
     }

@@ -8,14 +8,14 @@
 import Foundation
 
 internal struct ServiceContainer: ServiceContainerProtocol {
-    internal let hydrationStore: HydrationStoreProtocol
-    internal let goalStore: GoalStoreProtocol
+    internal let hydrationService: HydrationServiceProtocol
+    internal let goalService: GoalServiceProtocol
 
     internal init(
         hydrationStore: HydrationStoreProtocol = HydrationStore(),
         goalStore: GoalStoreProtocol = GoalStore()
     ) {
-        self.hydrationStore = hydrationStore
-        self.goalStore = goalStore
+        hydrationService = HydrationService(hydrationStore: hydrationStore)
+        goalService = GoalService(goalStore: goalStore)
     }
 }

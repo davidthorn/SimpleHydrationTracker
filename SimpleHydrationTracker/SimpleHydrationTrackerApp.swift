@@ -11,20 +11,21 @@ import SwiftUI
 internal struct SimpleHydrationTrackerApp: App {
     @State private var launchState: AppLaunchState
 
-    private let hydrationStore: HydrationStoreProtocol
-    private let goalStore: GoalStoreProtocol
+    private let hydrationService: HydrationServiceProtocol
+    private let goalService: GoalServiceProtocol
     private let serviceContainer: ServiceContainerProtocol
 
     internal init() {
         let hydrationStore = HydrationStore()
         let goalStore = GoalStore()
 
-        self.hydrationStore = hydrationStore
-        self.goalStore = goalStore
-        serviceContainer = ServiceContainer(
+        let serviceContainer = ServiceContainer(
             hydrationStore: hydrationStore,
             goalStore: goalStore
         )
+        self.serviceContainer = serviceContainer
+        hydrationService = serviceContainer.hydrationService
+        goalService = serviceContainer.goalService
 
         _launchState = State(initialValue: .loading)
     }
@@ -54,8 +55,8 @@ internal struct SimpleHydrationTrackerApp: App {
         }
 
         do {
-            _ = try await hydrationStore.fetchEntries()
-            _ = try await goalStore.fetchGoal()
+            _ = try await hydrationService.fetchEntries()
+            _ = try await goalService.fetchGoal()
 
             guard Task.isCancelled == false else {
                 return

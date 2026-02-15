@@ -20,13 +20,13 @@ internal struct TodayScene: View {
                 .navigationDestination(for: TodayRoute.self) { route in
                     switch route {
                     case .addCustomAmount:
-                        AddCustomAmountView()
+                        AddCustomAmountView(serviceContainer: serviceContainer)
                     case .editTodayEntry(let entryID):
-                        EditTodayEntryView(entryID: entryID)
+                        EditTodayEntryView(entryID: entryID, serviceContainer: serviceContainer)
                     case .dayDetail(let dayID):
-                        DayDetailView(dayID: dayID)
+                        DayDetailView(dayID: dayID, serviceContainer: serviceContainer)
                     case .goalSetup:
-                        GoalSetupView()
+                        GoalSetupView(serviceContainer: serviceContainer)
                     }
                 }
         }

@@ -8,6 +8,6 @@
 import Foundation
 
 internal protocol ServiceContainerProtocol: Sendable {
-    var hydrationStore: HydrationStoreProtocol { get }
-    var goalStore: GoalStoreProtocol { get }
+    var hydrationService: HydrationServiceProtocol { get }
+    var goalService: GoalServiceProtocol { get }
 }

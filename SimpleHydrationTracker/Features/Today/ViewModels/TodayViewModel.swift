@@ -13,20 +13,20 @@ import Models
 internal final class TodayViewModel: ObservableObject {
     @Published internal private(set) var state: TodayViewState
 
-    private let hydrationStore: HydrationStoreProtocol
-    private let goalStore: GoalStoreProtocol
+    private let hydrationService: HydrationServiceProtocol
+    private let goalService: GoalServiceProtocol
     private let calendar: Calendar
     private let nowProvider: () -> Date
     private var isSubscribed: Bool
 
     internal init(
-        hydrationStore: HydrationStoreProtocol,
-        goalStore: GoalStoreProtocol,
+        hydrationService: HydrationServiceProtocol,
+        goalService: GoalServiceProtocol,
         calendar: Calendar = .current,
         nowProvider: @escaping () -> Date = { Date() }
     ) {
-        self.hydrationStore = hydrationStore
-        self.goalStore = goalStore
+        self.hydrationService = hydrationService
+        self.goalService = goalService
         self.calendar = calendar
         self.nowProvider = nowProvider
         state = .loading(date: nowProvider())
@@ -40,7 +40,7 @@ internal final class TodayViewModel: ObservableObject {
         isSubscribed = true
 
         do {
-            let stream = try await hydrationStore.observeEntries()
+            let stream = try await hydrationService.observeEntries()
             for await entries in stream {
                 guard Task.isCancelled == false else {
                     return
@@ -72,7 +72,7 @@ internal final class TodayViewModel: ObservableObject {
             source: .quickAdd
         )
 
-        try await hydrationStore.upsertEntry(entry)
+        try await hydrationService.upsertEntry(entry)
     }
 
     private func refreshSummary(entries: [HydrationEntry]) async throws {
@@ -85,7 +85,7 @@ internal final class TodayViewModel: ObservableObject {
             partialResult + entry.amountMilliliters
         }
 
-        let goal = try await goalStore.fetchGoal()
+        let goal = try await goalService.fetchGoal()
         let goalMilliliters = goal?.dailyTargetMilliliters ?? 0
         let remainingMilliliters = max(goalMilliliters - consumedMilliliters, 0)
 

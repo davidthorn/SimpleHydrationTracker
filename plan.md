@@ -296,18 +296,41 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <today route view files>
-- <today scene files>
+- SimpleHydrationTracker/Scenes/Today/TodayScene.swift
+- SimpleHydrationTracker/Features/Today/Views/AddCustomAmountView.swift
+- SimpleHydrationTracker/Features/Today/Views/EditTodayEntryView.swift
+- SimpleHydrationTracker/Features/Today/Views/DayDetailView.swift
+- SimpleHydrationTracker/Features/Today/Views/GoalSetupView.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/AddCustomAmountViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/EditTodayEntryViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/DayDetailViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/GoalSetupViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/TodayViewModel.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayView.swift
+- SimpleHydrationTracker/Protocols/HydrationServiceProtocol.swift
+- SimpleHydrationTracker/Protocols/GoalServiceProtocol.swift
+- SimpleHydrationTracker/Protocols/ServiceContainerProtocol.swift
+- SimpleHydrationTracker/Services/HydrationService.swift
+- SimpleHydrationTracker/Services/GoalService.swift
+- SimpleHydrationTracker/Services/ServiceContainer.swift
+- SimpleHydrationTracker/Services/PreviewServiceContainer.swift
+- SimpleHydrationTracker/SimpleHydrationTrackerApp.swift
 
 Completed:
 - Implemented all TodayScene child route views.
 - Added save/reset/delete behavior where editable persisted models are used.
 - Added delete confirmation dialogs for all Today delete flows.
+- Wired route views to service dependencies from the owning scene.
+- Added route-level view models for loading, persistence actions, and error state.
+- Enforced architecture rule that ViewModels depend on Services only (no direct Store usage).
+- Added hydration/goal service protocols and concrete service implementations over stores.
+- Updated service container and app preload flow to use services as the dependency surface.
 
 Verification:
 - Navigation to all Today routes works and returns correctly.
 - Form button visibility follows `$swift` save/reset/delete rules.
 - Delete flows require confirm and support cancel.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
 ---

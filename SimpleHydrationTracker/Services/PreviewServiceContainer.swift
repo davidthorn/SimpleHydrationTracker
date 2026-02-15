@@ -10,16 +10,16 @@
     import Models
 
     internal struct PreviewServiceContainer: ServiceContainerProtocol {
-        internal let hydrationStore: HydrationStoreProtocol
-        internal let goalStore: GoalStoreProtocol
+        internal let hydrationService: HydrationServiceProtocol
+        internal let goalService: GoalServiceProtocol
 
         internal init() {
-            hydrationStore = PreviewHydrationStore()
-            goalStore = PreviewGoalStore()
+            hydrationService = PreviewHydrationService()
+            goalService = PreviewGoalService()
         }
     }
 
-    internal actor PreviewHydrationStore: HydrationStoreProtocol {
+    internal actor PreviewHydrationService: HydrationServiceProtocol {
         internal func observeEntries() async throws -> AsyncStream<[HydrationEntry]> {
             let streamPair = AsyncStream<[HydrationEntry]>.makeStream()
             streamPair.continuation.yield([])
@@ -35,7 +35,7 @@
         internal func deleteEntry(id: HydrationEntryIdentifier) async throws {}
     }
 
-    internal actor PreviewGoalStore: GoalStoreProtocol {
+    internal actor PreviewGoalService: GoalServiceProtocol {
         internal func observeGoal() async throws -> AsyncStream<HydrationGoal?> {
             let streamPair = AsyncStream<HydrationGoal?>.makeStream()
             streamPair.continuation.yield(nil)
