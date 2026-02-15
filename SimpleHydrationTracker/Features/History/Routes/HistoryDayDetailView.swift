@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import Models
 import SwiftUI
 
 internal struct HistoryDayDetailView: View {
-    internal let date: Date
+    internal let dayID: HydrationDayIdentifier
 
     internal var body: some View {
         Text("Day Detail")
@@ -19,6 +20,6 @@ internal struct HistoryDayDetailView: View {
 
 #if DEBUG
     #Preview {
-        HistoryDayDetailView(date: Date())
+        HistoryDayDetailView(dayID: HydrationDayIdentifier(value: Date()))
     }
 #endif

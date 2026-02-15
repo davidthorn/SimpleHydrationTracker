@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Models
 import SwiftUI
 
 internal struct TodayView: View {
@@ -14,10 +15,14 @@ internal struct TodayView: View {
             NavigationLink(value: TodayRoute.addCustomAmount) {
                 Text("Add Custom Amount")
             }
-            NavigationLink(value: TodayRoute.editTodayEntry(entryID: UUID())) {
+            NavigationLink(
+                value: TodayRoute.editTodayEntry(entryID: HydrationEntryIdentifier(value: UUID()))
+            ) {
                 Text("Edit Today Entry")
             }
-            NavigationLink(value: TodayRoute.dayDetail(date: Date())) {
+            NavigationLink(
+                value: TodayRoute.dayDetail(dayID: HydrationDayIdentifier(value: Date()))
+            ) {
                 Text("Day Detail")
             }
             NavigationLink(value: TodayRoute.goalSetup) {

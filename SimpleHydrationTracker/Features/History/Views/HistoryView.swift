@@ -6,15 +6,20 @@
 //
 
 import Foundation
+import Models
 import SwiftUI
 
 internal struct HistoryView: View {
     internal var body: some View {
         List {
-            NavigationLink(value: HistoryRoute.dayDetail(date: Date())) {
+            NavigationLink(
+                value: HistoryRoute.dayDetail(dayID: HydrationDayIdentifier(value: Date()))
+            ) {
                 Text("Day Detail")
             }
-            NavigationLink(value: HistoryRoute.entryDetail(entryID: UUID())) {
+            NavigationLink(
+                value: HistoryRoute.entryDetail(entryID: HydrationEntryIdentifier(value: UUID()))
+            ) {
                 Text("Entry Detail")
             }
             NavigationLink(value: HistoryRoute.historyFilter) {

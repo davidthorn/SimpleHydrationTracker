@@ -17,8 +17,8 @@ internal struct TodayScene: View {
                         AddCustomAmountView()
                     case .editTodayEntry(let entryID):
                         EditTodayEntryView(entryID: entryID)
-                    case .dayDetail(let date):
-                        DayDetailView(date: date)
+                    case .dayDetail(let dayID):
+                        DayDetailView(dayID: dayID)
                     case .goalSetup:
                         GoalSetupView()
                     }

@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import Models
 import SwiftUI
 
 internal struct EditTodayEntryView: View {
-    internal let entryID: UUID
+    internal let entryID: HydrationEntryIdentifier
 
     internal var body: some View {
         Text("Edit Entry")
@@ -19,6 +20,6 @@ internal struct EditTodayEntryView: View {
 
 #if DEBUG
     #Preview {
-        EditTodayEntryView(entryID: UUID())
+        EditTodayEntryView(entryID: HydrationEntryIdentifier(value: UUID()))
     }
 #endif

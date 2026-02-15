@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import Models
 
 internal enum TodayRoute: Hashable {
     case addCustomAmount
-    case editTodayEntry(entryID: UUID)
-    case dayDetail(date: Date)
+    case editTodayEntry(entryID: HydrationEntryIdentifier)
+    case dayDetail(dayID: HydrationDayIdentifier)
     case goalSetup
 }

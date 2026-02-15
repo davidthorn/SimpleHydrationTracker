@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import Models
 
 internal enum HistoryRoute: Hashable {
-    case dayDetail(date: Date)
-    case entryDetail(entryID: UUID)
+    case dayDetail(dayID: HydrationDayIdentifier)
+    case entryDetail(entryID: HydrationEntryIdentifier)
     case historyFilter
 }
