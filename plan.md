@@ -1,0 +1,421 @@
+# SimpleHydrationTracker Sprint Plan
+
+## Scope Guardrails (This Sprint)
+- iOS app only.
+- Watch app integration is out of scope.
+- Shared models required by watch must live in `Models` framework.
+- Persistence is file-system based JSON in app `Documents` directory.
+- Persisted entities are `Codable`, `Identifiable`, `Hashable`.
+- Data loads at launch before first feature render.
+- Top-level scenes are only:
+  - `TodayScene`
+  - `HistoryScene`
+  - `SettingsScene`
+
+## Commit Policy For Every Task
+- Stop each task at a working state (buildable and reviewable).
+- Create one commit per task.
+- Use the planned commit subject exactly.
+- After task completion, fill the commit body with:
+  - changed files
+  - completed work
+  - verification notes
+
+### Commit Body Template (Post-Completion)
+```text
+Files changed:
+- <path>
+- <path>
+
+Completed:
+- <implemented behavior>
+- <implemented behavior>
+
+Verification:
+- <build/run/manual check>
+- <notes>
+```
+
+---
+
+## Stage 1 - Foundation and App Skeleton
+Goal: establish architecture, navigation roots, and design token baseline.
+
+### Task 1.1 - Create folders and feature boundaries
+Planned commit subject:
+`chore: establish scene-feature-service-store-viewmodel folder structure`
+
+Post-completion commit body:
+```text
+Files changed:
+- <list created/moved files and folders>
+
+Completed:
+- Added project folder layout for Scenes, Features, Views, ViewModels, Services, Stores.
+- Reserved structure for Today, History, Settings feature areas.
+
+Verification:
+- Project opens and compiles after file moves.
+```
+
+### Task 1.2 - Replace placeholder root with single TabView and scene roots
+Planned commit subject:
+`feat: wire ContentView TabView to TodayScene HistoryScene SettingsScene`
+
+Post-completion commit body:
+```text
+Files changed:
+- SimpleHydrationTracker/ContentView.swift
+- <scene files>
+
+Completed:
+- Added exactly one TabView in ContentView.
+- Added TodayScene, HistoryScene, SettingsScene as tab roots.
+- No additional TabView introduced elsewhere.
+
+Verification:
+- xcodebuild iOS target succeeds.
+- Tab navigation renders all 3 root scenes.
+```
+
+### Task 1.3 - Add route enums and destination wiring per scene
+Planned commit subject:
+`feat: add scene-owned navigation routes and destinations`
+
+Post-completion commit body:
+```text
+Files changed:
+- <scene route files>
+- <scene files>
+
+Completed:
+- Added Hashable route values per scene.
+- Added NavigationLink(value:) + navigationDestination(for:) in owning scene only.
+- Added placeholder route views for all declared routes.
+
+Verification:
+- In-flow navigation pushes expected destination views.
+```
+
+---
+
+## Stage 2 - Shared Models in Models Framework
+Goal: define all shared domain models as public and watch-ready.
+
+### Task 2.1 - Create shared hydration domain models
+Planned commit subject:
+`feat(models): add public shared hydration model types`
+
+Post-completion commit body:
+```text
+Files changed:
+- Models/<model files>.swift
+
+Completed:
+- Added shared models in Models framework with one type per file.
+- Ensured public structs, public properties, public initializers.
+- Conformed persisted entities to Codable, Identifiable, Hashable, Sendable where valid.
+
+Verification:
+- Models target builds cleanly.
+```
+
+### Task 2.2 - Add route payload model identifiers
+Planned commit subject:
+`feat(models): add route-safe identifier and date payload structures`
+
+Post-completion commit body:
+```text
+Files changed:
+- Models/<identifier/payload files>.swift
+
+Completed:
+- Added route payload models for entry and day navigation.
+- Standardized IDs and date payload usage across features.
+
+Verification:
+- Scene route enums compile using model payloads.
+```
+
+---
+
+## Stage 3 - File-Based Persistence and Streams
+Goal: actor-backed stores with JSON in Documents and launch-time loading.
+
+### Task 3.1 - Build file path and JSON codec helpers
+Planned commit subject:
+`feat(store): add documents directory file path and json codec utilities`
+
+Post-completion commit body:
+```text
+Files changed:
+- <store/support files>
+
+Completed:
+- Added reusable Documents file resolution helpers.
+- Added reusable JSONEncoder/JSONDecoder setup at owner scope.
+
+Verification:
+- Helper usage validated in a local store integration path.
+```
+
+### Task 3.2 - Implement hydration store protocol + actor
+Planned commit subject:
+`feat(store): implement actor-backed hydration store with asyncstream updates`
+
+Post-completion commit body:
+```text
+Files changed:
+- <store protocol file>
+- <store actor file>
+
+Completed:
+- Added protocol-backed hydration store.
+- Implemented read/write to Documents JSON.
+- Added AsyncStream publication for updates.
+
+Verification:
+- Add/update/delete flows persist and reload correctly.
+```
+
+### Task 3.3 - Implement goal store protocol + actor and app launch load
+Planned commit subject:
+`feat(store): add goal persistence and load persisted state on app launch`
+
+Post-completion commit body:
+```text
+Files changed:
+- <goal store files>
+- SimpleHydrationTracker/SimpleHydrationTrackerApp.swift
+- <app bootstrap files>
+
+Completed:
+- Added protocol-backed goal store with actor implementation.
+- Wired startup loading before first feature render.
+
+Verification:
+- Relaunch restores goal and hydration entries from Documents files.
+```
+
+---
+
+## Stage 4 - Today Feature (Primary Experience)
+Goal: working today flow with quick logging, custom logging, and goal setup route.
+
+### Task 4.1 - Today view model and stream subscription
+Planned commit subject:
+`feat(today): add TodayViewModel with store stream subscription`
+
+Post-completion commit body:
+```text
+Files changed:
+- <today viewmodel file>
+- <today dependency wiring files>
+
+Completed:
+- Added TodayViewModel and state projection for today summary.
+- Subscribed to store AsyncStream updates.
+- Ensured UI-facing mutations are MainActor safe.
+
+Verification:
+- Today state updates immediately after store changes.
+```
+
+### Task 4.2 - Today main view and progress UI
+Planned commit subject:
+`feat(today): build progress-first today view with quick add actions`
+
+Post-completion commit body:
+```text
+Files changed:
+- <today view files>
+- <today components files>
+
+Completed:
+- Added custom-styled Today UI with progress hero and quick-add actions.
+- Added Task-based button actions with cancellation guard checks.
+
+Verification:
+- Quick-add updates progress and persists entries.
+```
+
+### Task 4.3 - Today child routes implementation
+Planned commit subject:
+`feat(today): implement addCustomAmount editTodayEntry dayDetail goalSetup routes`
+
+Post-completion commit body:
+```text
+Files changed:
+- <today route view files>
+- <today scene files>
+
+Completed:
+- Implemented all TodayScene child route views.
+- Added save/reset/delete behavior where editable persisted models are used.
+
+Verification:
+- Navigation to all Today routes works and returns correctly.
+```
+
+---
+
+## Stage 5 - History Feature
+Goal: browse prior days and inspect entries.
+
+### Task 5.1 - History view model and day list
+Planned commit subject:
+`feat(history): add history list projection and grouping by day`
+
+Post-completion commit body:
+```text
+Files changed:
+- <history viewmodel file>
+- <history view files>
+
+Completed:
+- Added history projection by day from persisted entries.
+- Added list UI optimized for fast scanning.
+
+Verification:
+- History shows correct day groups from stored data.
+```
+
+### Task 5.2 - History child routes implementation
+Planned commit subject:
+`feat(history): implement dayDetail entryDetail historyFilter routes`
+
+Post-completion commit body:
+```text
+Files changed:
+- <history route view files>
+- <history scene files>
+
+Completed:
+- Implemented day detail, entry detail, and filter route views.
+- Added scene-owned destination registration for all history routes.
+
+Verification:
+- Route transitions and filters function as expected.
+```
+
+---
+
+## Stage 6 - Settings and Reminder Services
+Goal: settings flows and service-level reminder behavior.
+
+### Task 6.1 - Settings view model and settings root UI
+Planned commit subject:
+`feat(settings): add settings root flow and editable preference state`
+
+Post-completion commit body:
+```text
+Files changed:
+- <settings viewmodel file>
+- <settings view files>
+
+Completed:
+- Added settings root view model/state.
+- Added route links for goal, reminder, permissions, units, and data management.
+
+Verification:
+- Settings routes present correctly.
+```
+
+### Task 6.2 - Reminder service protocol and implementation
+Planned commit subject:
+`feat(reminders): implement notification scheduling service abstraction`
+
+Post-completion commit body:
+```text
+Files changed:
+- <reminder service protocol file>
+- <reminder service implementation file>
+
+Completed:
+- Added protocol-backed reminder service using Apple notification APIs.
+- Added cadence logic for gentle reminder spacing and rescheduling.
+
+Verification:
+- Reminder schedule requests can be created and refreshed from settings changes.
+```
+
+### Task 6.3 - Settings child routes implementation
+Planned commit subject:
+`feat(settings): implement goal reminders permissions units and data management routes`
+
+Post-completion commit body:
+```text
+Files changed:
+- <settings route view files>
+- <settings scene files>
+
+Completed:
+- Implemented all SettingsScene child routes.
+- Added required save/reset/delete + confirmation behavior where persisted models are edited.
+
+Verification:
+- All settings routes save and reload persisted changes.
+```
+
+---
+
+## Stage 7 - Polish, Validation, and Handoff
+Goal: production-readiness checks and review handoff quality.
+
+### Task 7.1 - Theme pass and UX polish
+Planned commit subject:
+`feat(ui): apply custom clean-cut design system across all scenes`
+
+Post-completion commit body:
+```text
+Files changed:
+- <theme files>
+- <updated view files>
+
+Completed:
+- Applied non-default visual system (tokens, spacing, typography hierarchy, component styles).
+- Ensured intuitive action hierarchy and strong readability.
+
+Verification:
+- Manual QA on common flows across Today, History, Settings.
+```
+
+### Task 7.2 - Build and warning gate pass
+Planned commit subject:
+`chore: complete build validation and remove compiler warnings`
+
+Post-completion commit body:
+```text
+Files changed:
+- <files adjusted to fix warnings/build issues>
+
+Completed:
+- Resolved compiler warnings.
+- Confirmed iOS build success for review handoff.
+
+Verification:
+- xcodebuild with iPhone 17 Pro simulator passes for iOS app target.
+```
+
+### Task 7.3 - Sprint closeout documentation
+Planned commit subject:
+`docs: add sprint implementation summary and pending watch integration notes`
+
+Post-completion commit body:
+```text
+Files changed:
+- <docs files>
+
+Completed:
+- Documented implemented behavior, known limitations, and explicit watch integration follow-ups.
+- Captured service-level extension points for future WatchConnectivity.
+
+Verification:
+- Documentation reflects shipped sprint behavior and next sprint entry points.
+```
+
+---
+
+## Future Sprint Placeholder (Not In Scope Now)
+- Add service-level WatchConnectivity sync for phone-to-watch update propagation.
+- Keep UI unchanged while wiring WC in service layer.
