@@ -480,17 +480,27 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <reminder service protocol file>
-- <reminder service implementation file>
+- SimpleHydrationTracker/Protocols/ReminderServiceProtocol.swift
+- SimpleHydrationTracker/Protocols/ServiceContainerProtocol.swift
+- SimpleHydrationTracker/Features/Settings/Models/ReminderAuthorizationStatus.swift
+- SimpleHydrationTracker/Features/Settings/Models/ReminderSchedule.swift
+- SimpleHydrationTracker/Features/Settings/Models/ReminderServiceError.swift
+- SimpleHydrationTracker/Services/ReminderService.swift
+- SimpleHydrationTracker/Services/ServiceContainer.swift
+- SimpleHydrationTracker/Services/PreviewServiceContainer.swift
 
 Completed:
 - Added protocol-backed reminder service using Apple notification APIs.
 - Added cadence logic for gentle reminder spacing and rescheduling.
 - Added permission status mapping for notDetermined/denied/authorized/provisional states.
+- Added actor-backed service implementation with schedule update/clear operations.
+- Added authorization status AsyncStream observation for UI consumers.
+- Added service container integration and preview reminder service implementation.
 
 Verification:
 - Reminder schedule requests can be created and refreshed from settings changes.
 - Permission request path works, and denied/restricted states can be surfaced to UI components.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
 ### Task 6.3 - Settings child routes implementation

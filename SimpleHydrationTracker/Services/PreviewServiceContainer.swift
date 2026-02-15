@@ -12,10 +12,12 @@
     internal struct PreviewServiceContainer: ServiceContainerProtocol {
         internal let hydrationService: HydrationServiceProtocol
         internal let goalService: GoalServiceProtocol
+        internal let reminderService: ReminderServiceProtocol
 
         internal init() {
             hydrationService = PreviewHydrationService()
             goalService = PreviewGoalService()
+            reminderService = PreviewReminderService()
         }
     }
 
@@ -49,5 +51,25 @@
         internal func upsertGoal(_ goal: HydrationGoal) async throws {}
 
         internal func deleteGoal() async throws {}
+    }
+
+    internal actor PreviewReminderService: ReminderServiceProtocol {
+        internal func observeAuthorizationStatus() async -> AsyncStream<ReminderAuthorizationStatus> {
+            let streamPair = AsyncStream<ReminderAuthorizationStatus>.makeStream()
+            streamPair.continuation.yield(.authorized)
+            return streamPair.stream
+        }
+
+        internal func fetchAuthorizationStatus() async -> ReminderAuthorizationStatus {
+            .authorized
+        }
+
+        internal func requestAuthorization() async throws -> ReminderAuthorizationStatus {
+            .authorized
+        }
+
+        internal func updateSchedule(_ schedule: ReminderSchedule?) async throws {}
+
+        internal func clearSchedule() async throws {}
     }
 #endif
