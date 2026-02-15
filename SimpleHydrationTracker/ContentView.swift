@@ -7,18 +7,29 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+internal struct ContentView: View {
+    internal var body: some View {
+        TabView {
+            TodayScene()
+                .tabItem {
+                    Label("Today", systemImage: "drop.fill")
+                }
+
+            HistoryScene()
+                .tabItem {
+                    Label("History", systemImage: "calendar")
+                }
+
+            SettingsScene()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape.fill")
+                }
         }
-        .padding()
     }
 }
 
-#Preview {
-    ContentView()
-}
+#if DEBUG
+    #Preview {
+        ContentView()
+    }
+#endif
