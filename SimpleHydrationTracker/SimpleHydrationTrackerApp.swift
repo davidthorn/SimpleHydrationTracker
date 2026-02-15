@@ -55,6 +55,11 @@ internal struct SimpleHydrationTrackerApp: App {
         }
 
         do {
+            #if DEBUG
+                if let debugHydrationBootstrapService = hydrationService as? HydrationDebugBootstrapServiceProtocol {
+                    try await debugHydrationBootstrapService.bootstrapIfNeeded()
+                }
+            #endif
             _ = try await hydrationService.fetchEntries()
             _ = try await goalService.fetchGoal()
 

@@ -41,6 +41,7 @@
         internal func upsertEntry(_ entry: HydrationEntry) async throws {}
 
         internal func deleteEntry(id: HydrationEntryIdentifier) async throws {}
+
     }
 
     internal actor PreviewGoalService: GoalServiceProtocol {

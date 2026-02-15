@@ -9,7 +9,7 @@ import Foundation
 import Models
 
 internal struct HydrationService: HydrationServiceProtocol {
-    private let hydrationStore: HydrationStoreProtocol
+    internal let hydrationStore: HydrationStoreProtocol
 
     internal init(hydrationStore: HydrationStoreProtocol) {
         self.hydrationStore = hydrationStore
