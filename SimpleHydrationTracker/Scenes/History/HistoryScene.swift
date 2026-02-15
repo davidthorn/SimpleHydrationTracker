@@ -11,6 +11,16 @@ internal struct HistoryScene: View {
     internal var body: some View {
         NavigationStack {
             HistoryView()
+                .navigationDestination(for: HistoryRoute.self) { route in
+                    switch route {
+                    case .dayDetail(let date):
+                        HistoryDayDetailView(date: date)
+                    case .entryDetail(let entryID):
+                        EntryDetailView(entryID: entryID)
+                    case .historyFilter:
+                        HistoryFilterView()
+                    }
+                }
         }
     }
 }

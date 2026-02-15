@@ -11,6 +11,18 @@ internal struct TodayScene: View {
     internal var body: some View {
         NavigationStack {
             TodayView()
+                .navigationDestination(for: TodayRoute.self) { route in
+                    switch route {
+                    case .addCustomAmount:
+                        AddCustomAmountView()
+                    case .editTodayEntry(let entryID):
+                        EditTodayEntryView(entryID: entryID)
+                    case .dayDetail(let date):
+                        DayDetailView(date: date)
+                    case .goalSetup:
+                        GoalSetupView()
+                    }
+                }
         }
     }
 }
