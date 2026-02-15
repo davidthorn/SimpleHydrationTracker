@@ -238,16 +238,27 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <today viewmodel file>
-- <today dependency wiring files>
+- SimpleHydrationTracker/Features/Today/ViewModels/TodayViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/TodayViewState.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayView.swift
+- SimpleHydrationTracker/Scenes/Today/TodayScene.swift
+- SimpleHydrationTracker/ContentView.swift
+- SimpleHydrationTracker/SimpleHydrationTrackerApp.swift
+- SimpleHydrationTracker/Protocols/ServiceContainerProtocol.swift
+- SimpleHydrationTracker/Services/ServiceContainer.swift
+- SimpleHydrationTracker/Services/PreviewServiceContainer.swift
 
 Completed:
 - Added TodayViewModel and state projection for today summary.
 - Subscribed to store AsyncStream updates.
 - Ensured UI-facing mutations are MainActor safe.
+- Updated Today view wiring to initialize the view model from protocol-backed stores.
+- Enforced app ownership of concrete `ServiceContainer` creation (`SimpleHydrationTrackerApp` owns construction).
+- Removed concrete `ServiceContainer` creation from view/scene paths and switched previews to debug-only `PreviewServiceContainer`.
 
 Verification:
 - Today state updates immediately after store changes.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
 ### Task 4.2 - Today main view and progress UI

@@ -8,9 +8,15 @@
 import SwiftUI
 
 internal struct ContentView: View {
+    private let serviceContainer: ServiceContainerProtocol
+
+    internal init(serviceContainer: ServiceContainerProtocol) {
+        self.serviceContainer = serviceContainer
+    }
+
     internal var body: some View {
         TabView {
-            TodayScene()
+            TodayScene(serviceContainer: serviceContainer)
                 .tabItem {
                     Label("Today", systemImage: "drop.fill")
                 }
@@ -30,6 +36,6 @@ internal struct ContentView: View {
 
 #if DEBUG
     #Preview {
-        ContentView()
+        ContentView(serviceContainer: PreviewServiceContainer())
     }
 #endif

@@ -8,9 +8,15 @@
 import SwiftUI
 
 internal struct TodayScene: View {
+    private let serviceContainer: ServiceContainerProtocol
+
+    internal init(serviceContainer: ServiceContainerProtocol) {
+        self.serviceContainer = serviceContainer
+    }
+
     internal var body: some View {
         NavigationStack {
-            TodayView()
+            TodayView(serviceContainer: serviceContainer)
                 .navigationDestination(for: TodayRoute.self) { route in
                     switch route {
                     case .addCustomAmount:
@@ -29,6 +35,6 @@ internal struct TodayScene: View {
 
 #if DEBUG
     #Preview {
-        TodayScene()
+        TodayScene(serviceContainer: PreviewServiceContainer())
     }
 #endif

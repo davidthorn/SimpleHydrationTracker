@@ -13,10 +13,19 @@ internal struct SimpleHydrationTrackerApp: App {
 
     private let hydrationStore: HydrationStoreProtocol
     private let goalStore: GoalStoreProtocol
+    private let serviceContainer: ServiceContainerProtocol
 
     internal init() {
-        hydrationStore = HydrationStore()
-        goalStore = GoalStore()
+        let hydrationStore = HydrationStore()
+        let goalStore = GoalStore()
+
+        self.hydrationStore = hydrationStore
+        self.goalStore = goalStore
+        serviceContainer = ServiceContainer(
+            hydrationStore: hydrationStore,
+            goalStore: goalStore
+        )
+
         _launchState = State(initialValue: .loading)
     }
 
@@ -27,7 +36,7 @@ internal struct SimpleHydrationTrackerApp: App {
                 case .loading:
                     LaunchLoadingView()
                 case .ready:
-                    ContentView()
+                    ContentView(serviceContainer: serviceContainer)
                 case .failed(let message):
                     LaunchErrorView(message: message)
                 }
