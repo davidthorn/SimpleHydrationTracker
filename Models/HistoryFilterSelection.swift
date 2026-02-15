@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum HistoryFilterSelection: String, CaseIterable, Identifiable, Sendable {
+public enum HistoryFilterSelection: String, CaseIterable, Identifiable, Codable, Sendable {
     case last7Days
     case last30Days
     case last90Days

@@ -16,7 +16,12 @@ internal struct HistoryDayDetailView: View {
 
     internal init(dayID: HydrationDayIdentifier, serviceContainer: ServiceContainerProtocol) {
         self.dayID = dayID
-        let vm = HistoryDayDetailViewModel(dayID: dayID, hydrationService: serviceContainer.hydrationService)
+        let vm = HistoryDayDetailViewModel(
+            dayID: dayID,
+            hydrationService: serviceContainer.hydrationService,
+            unitsPreferenceService: serviceContainer.unitsPreferenceService,
+            historyFilterPreferenceService: serviceContainer.historyFilterPreferenceService
+        )
         _viewModel = StateObject(wrappedValue: vm)
     }
 
@@ -36,7 +41,8 @@ internal struct HistoryDayDetailView: View {
                     HistorySummaryCardComponent(
                         date: dayID.value,
                         totalMilliliters: viewModel.totalMilliliters,
-                        entryCount: viewModel.entries.count
+                        entryCount: viewModel.entries.count,
+                        selectedUnit: viewModel.selectedUnit
                     )
 
                     if let errorMessage = viewModel.errorMessage {
@@ -60,7 +66,10 @@ internal struct HistoryDayDetailView: View {
                             NavigationLink(
                                 value: HistoryRoute.entryDetail(entryID: HydrationEntryIdentifier(value: entry.id))
                             ) {
-                                HistoryEntryRowComponent(entry: entry)
+                                HistoryEntryRowComponent(
+                                    entry: entry,
+                                    selectedUnit: viewModel.selectedUnit
+                                )
                             }
                             .buttonStyle(.plain)
                         }
@@ -71,6 +80,13 @@ internal struct HistoryDayDetailView: View {
             }
         }
         .navigationTitle("Day Detail")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: HistoryRoute.historyFilter) {
+                    Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
+                }
+            }
+        }
         .task {
             guard Task.isCancelled == false else {
                 return

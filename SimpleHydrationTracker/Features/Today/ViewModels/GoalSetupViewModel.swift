@@ -14,21 +14,27 @@ internal final class GoalSetupViewModel: ObservableObject {
     @Published internal var goalText: String
     @Published internal private(set) var errorMessage: String?
     @Published internal private(set) var isLoading: Bool
+    @Published internal private(set) var selectedUnit: SettingsVolumeUnit
 
     private let goalService: GoalServiceProtocol
+    private let unitsPreferenceService: UnitsPreferenceServiceProtocol
     private let nowProvider: () -> Date
     private var originalGoal: HydrationGoal?
     private var hasLoaded: Bool
+    private var unitsObservationTask: Task<Void, Never>?
 
     internal init(
         goalService: GoalServiceProtocol,
+        unitsPreferenceService: UnitsPreferenceServiceProtocol,
         nowProvider: @escaping () -> Date = { Date() }
     ) {
         self.goalService = goalService
+        self.unitsPreferenceService = unitsPreferenceService
         self.nowProvider = nowProvider
         goalText = ""
         errorMessage = nil
         isLoading = false
+        selectedUnit = .milliliters
         originalGoal = nil
         hasLoaded = false
     }
@@ -46,7 +52,7 @@ internal final class GoalSetupViewModel: ObservableObject {
             return false
         }
 
-        guard let goalAmount = Int(goalText.trimmingCharacters(in: .whitespacesAndNewlines)), goalAmount > 0 else {
+        guard let goalAmount = selectedUnit.parseAmountText(goalText) else {
             return true
         }
 
@@ -54,11 +60,9 @@ internal final class GoalSetupViewModel: ObservableObject {
     }
 
     internal var canSave: Bool {
-        guard let goalAmount = Int(goalText.trimmingCharacters(in: .whitespacesAndNewlines)), goalAmount > 0 else {
+        guard selectedUnit.parseAmountText(goalText) != nil else {
             return false
         }
-
-        let _ = goalAmount
         return hasChanges
     }
 
@@ -77,11 +81,14 @@ internal final class GoalSetupViewModel: ObservableObject {
 
         hasLoaded = true
         isLoading = true
+        unitsObservationTask = Task {
+            await observeUnits()
+        }
 
         do {
             let goal = try await goalService.fetchGoal()
             originalGoal = goal
-            goalText = goal.map { String($0.dailyTargetMilliliters) } ?? ""
+            goalText = goal.map { selectedUnit.editableAmountText(milliliters: $0.dailyTargetMilliliters) } ?? ""
             errorMessage = nil
             isLoading = false
         } catch {
@@ -91,8 +98,8 @@ internal final class GoalSetupViewModel: ObservableObject {
     }
 
     internal func saveGoal() async throws {
-        guard let goalAmount = Int(goalText.trimmingCharacters(in: .whitespacesAndNewlines)), goalAmount > 0 else {
-            errorMessage = "Enter a valid goal greater than 0 ml."
+        guard let goalAmount = selectedUnit.parseAmountText(goalText) else {
+            errorMessage = "Enter a valid goal greater than 0 \(selectedUnit.shortLabel)."
             return
         }
 
@@ -112,7 +119,7 @@ internal final class GoalSetupViewModel: ObservableObject {
             return
         }
 
-        goalText = String(originalGoal.dailyTargetMilliliters)
+        goalText = selectedUnit.editableAmountText(milliliters: originalGoal.dailyTargetMilliliters)
         errorMessage = nil
     }
 
@@ -125,5 +132,31 @@ internal final class GoalSetupViewModel: ObservableObject {
         originalGoal = nil
         goalText = ""
         errorMessage = nil
+    }
+
+    deinit {
+        unitsObservationTask?.cancel()
+    }
+
+    private func observeUnits() async {
+        let stream = await unitsPreferenceService.observeUnit()
+        for await unit in stream {
+            guard Task.isCancelled == false else {
+                return
+            }
+
+            let hadChanges = hasChanges
+            selectedUnit = unit
+
+            guard hadChanges == false else {
+                continue
+            }
+
+            if let originalGoal {
+                goalText = unit.editableAmountText(milliliters: originalGoal.dailyTargetMilliliters)
+            } else {
+                goalText = ""
+            }
+        }
     }
 }

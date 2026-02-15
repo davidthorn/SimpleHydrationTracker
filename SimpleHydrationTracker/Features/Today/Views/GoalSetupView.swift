@@ -15,7 +15,10 @@ internal struct GoalSetupView: View {
     @State private var isDeleting: Bool
 
     internal init(serviceContainer: ServiceContainerProtocol) {
-        let vm = GoalSetupViewModel(goalService: serviceContainer.goalService)
+        let vm = GoalSetupViewModel(
+            goalService: serviceContainer.goalService,
+            unitsPreferenceService: serviceContainer.unitsPreferenceService
+        )
         _viewModel = StateObject(wrappedValue: vm)
         _showDeleteConfirmation = State(initialValue: false)
         _isSaving = State(initialValue: false)
@@ -25,8 +28,11 @@ internal struct GoalSetupView: View {
     internal var body: some View {
         Form {
             Section("Daily Goal") {
-                TextField("Milliliters", text: $viewModel.goalText)
-                    .keyboardType(.numberPad)
+                TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.goalText)
+                    .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
+                Text("Unit: \(viewModel.selectedUnit.shortLabel)")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.muted)
             }
 
             if let errorMessage = viewModel.errorMessage {
@@ -54,6 +60,12 @@ internal struct GoalSetupView: View {
             }
         }
         .navigationTitle("Goal Setup")
+        .task {
+            guard Task.isCancelled == false else {
+                return
+            }
+            await viewModel.loadIfNeeded()
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.canSave {
@@ -103,12 +115,6 @@ internal struct GoalSetupView: View {
                     }
                 }
             }
-        }
-        .task {
-            guard Task.isCancelled == false else {
-                return
-            }
-            await viewModel.loadIfNeeded()
         }
     }
 }

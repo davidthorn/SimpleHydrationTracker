@@ -13,7 +13,12 @@ internal struct HistoryView: View {
     @StateObject private var viewModel: HistoryViewModel
 
     internal init(serviceContainer: ServiceContainerProtocol) {
-        let vm = HistoryViewModel(hydrationService: serviceContainer.hydrationService)
+        let vm = HistoryViewModel(
+            hydrationService: serviceContainer.hydrationService,
+            goalService: serviceContainer.goalService,
+            unitsPreferenceService: serviceContainer.unitsPreferenceService,
+            historyFilterPreferenceService: serviceContainer.historyFilterPreferenceService
+        )
         _viewModel = StateObject(wrappedValue: vm)
     }
 
@@ -49,7 +54,10 @@ internal struct HistoryView: View {
                     } else {
                         ForEach(viewModel.daySummaries) { daySummary in
                             NavigationLink(value: HistoryRoute.dayDetail(dayID: daySummary.dayID)) {
-                                HistoryDayRowComponent(summary: daySummary)
+                                HistoryDayRowComponent(
+                                    summary: daySummary,
+                                    selectedUnit: viewModel.selectedUnit
+                                )
                             }
                             .buttonStyle(.plain)
                         }

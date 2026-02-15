@@ -15,7 +15,10 @@ internal struct GoalSettingsView: View {
     @State private var isDeleting: Bool
 
     internal init(serviceContainer: ServiceContainerProtocol) {
-        let vm = GoalSettingsViewModel(goalService: serviceContainer.goalService)
+        let vm = GoalSettingsViewModel(
+            goalService: serviceContainer.goalService,
+            unitsPreferenceService: serviceContainer.unitsPreferenceService
+        )
         _viewModel = StateObject(wrappedValue: vm)
         _showDeleteConfirmation = State(initialValue: false)
         _isSaving = State(initialValue: false)
@@ -25,9 +28,12 @@ internal struct GoalSettingsView: View {
     internal var body: some View {
         Form {
             Section("Daily Goal") {
-                TextField("Milliliters", text: $viewModel.goalText)
-                    .keyboardType(.numberPad)
+                TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.goalText)
+                    .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
                     .disabled(isSaving || isDeleting || viewModel.isLoading)
+                Text("Unit: \(viewModel.selectedUnit.shortLabel)")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.muted)
             }
 
             if let errorMessage = viewModel.errorMessage {

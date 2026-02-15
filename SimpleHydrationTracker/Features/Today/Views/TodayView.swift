@@ -21,7 +21,8 @@ internal struct TodayView: View {
         self.quickAddOptions = quickAddOptions
         let vm = TodayViewModel(
             hydrationService: serviceContainer.hydrationService,
-            goalService: serviceContainer.goalService
+            goalService: serviceContainer.goalService,
+            unitsPreferenceService: serviceContainer.unitsPreferenceService
         )
         _viewModel = StateObject(wrappedValue: vm)
     }
@@ -33,10 +34,14 @@ internal struct TodayView: View {
                     consumedMilliliters: viewModel.state.consumedMilliliters,
                     goalMilliliters: viewModel.state.goalMilliliters,
                     remainingMilliliters: viewModel.state.remainingMilliliters,
-                    progress: viewModel.state.progress
+                    progress: viewModel.state.progress,
+                    selectedUnit: viewModel.selectedUnit
                 )
 
-                TodayQuickAddSectionView(quickAddOptions: quickAddOptions) { amount in
+                TodayQuickAddSectionView(
+                    quickAddOptions: quickAddOptions,
+                    selectedUnit: viewModel.selectedUnit
+                ) { amount in
                     Task {
                         guard Task.isCancelled == false else {
                             return

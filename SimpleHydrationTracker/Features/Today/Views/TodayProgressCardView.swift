@@ -12,17 +12,20 @@ internal struct TodayProgressCardView: View {
     private let goalMilliliters: Int
     private let remainingMilliliters: Int
     private let progress: Double
+    private let selectedUnit: SettingsVolumeUnit
 
     internal init(
         consumedMilliliters: Int,
         goalMilliliters: Int,
         remainingMilliliters: Int,
-        progress: Double
+        progress: Double,
+        selectedUnit: SettingsVolumeUnit
     ) {
         self.consumedMilliliters = consumedMilliliters
         self.goalMilliliters = goalMilliliters
         self.remainingMilliliters = remainingMilliliters
         self.progress = progress
+        self.selectedUnit = selectedUnit
     }
 
     internal var body: some View {
@@ -39,9 +42,9 @@ internal struct TodayProgressCardView: View {
                 .tint(.blue)
 
             HStack(spacing: 12) {
-                todayMetric(title: "Consumed", value: "\(consumedMilliliters) ml")
+                todayMetric(title: "Consumed", value: selectedUnit.format(milliliters: consumedMilliliters))
                 todayMetric(title: "Goal", value: goalText)
-                todayMetric(title: "Remaining", value: "\(remainingMilliliters) ml")
+                todayMetric(title: "Remaining", value: selectedUnit.format(milliliters: remainingMilliliters))
             }
         }
         .padding(16)
@@ -62,7 +65,7 @@ internal struct TodayProgressCardView: View {
             return "Set goal"
         }
 
-        return "\(goalMilliliters) ml"
+        return selectedUnit.format(milliliters: goalMilliliters)
     }
 
     private func todayMetric(title: String, value: String) -> some View {
@@ -85,7 +88,8 @@ internal struct TodayProgressCardView: View {
             consumedMilliliters: 1250,
             goalMilliliters: 2500,
             remainingMilliliters: 1250,
-            progress: 0.5
+            progress: 0.5,
+            selectedUnit: .milliliters
         )
         .padding()
     }

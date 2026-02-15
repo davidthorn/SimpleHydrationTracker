@@ -10,11 +10,12 @@ import SwiftUI
 
 internal struct HistoryEntryRowComponent: View {
     internal let entry: HydrationEntry
+    internal let selectedUnit: SettingsVolumeUnit
 
     internal var body: some View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(entry.amountMilliliters) ml")
+                Text(selectedUnit.format(milliliters: entry.amountMilliliters))
                     .font(.headline)
                 Text(entry.consumedAt.formatted(date: .omitted, time: .shortened))
                     .font(.footnote)
@@ -53,7 +54,8 @@ internal struct HistoryEntryRowComponent: View {
                 amountMilliliters: 350,
                 consumedAt: Date(),
                 source: .quickAdd
-            )
+            ),
+            selectedUnit: .milliliters
         )
         .padding()
         .background(AppTheme.pageGradient)

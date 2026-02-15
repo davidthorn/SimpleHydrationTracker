@@ -20,7 +20,11 @@ internal struct EditTodayEntryView: View {
 
     internal init(entryID: HydrationEntryIdentifier, serviceContainer: ServiceContainerProtocol) {
         self.entryID = entryID
-        let vm = EditTodayEntryViewModel(entryID: entryID, hydrationService: serviceContainer.hydrationService)
+        let vm = EditTodayEntryViewModel(
+            entryID: entryID,
+            hydrationService: serviceContainer.hydrationService,
+            unitsPreferenceService: serviceContainer.unitsPreferenceService
+        )
         _viewModel = StateObject(wrappedValue: vm)
         _showDeleteConfirmation = State(initialValue: false)
         _isSaving = State(initialValue: false)
@@ -30,8 +34,11 @@ internal struct EditTodayEntryView: View {
     internal var body: some View {
         Form {
             Section("Amount") {
-                TextField("Milliliters", text: $viewModel.amountText)
-                    .keyboardType(.numberPad)
+                TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.amountText)
+                    .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
+                Text("Unit: \(viewModel.selectedUnit.shortLabel)")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.muted)
             }
 
             Section("When") {

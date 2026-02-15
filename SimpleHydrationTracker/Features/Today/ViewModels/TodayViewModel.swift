@@ -12,25 +12,37 @@ import Models
 @MainActor
 internal final class TodayViewModel: ObservableObject {
     @Published internal private(set) var state: TodayViewState
+    @Published internal private(set) var selectedUnit: SettingsVolumeUnit
 
     private let hydrationService: HydrationServiceProtocol
     private let goalService: GoalServiceProtocol
+    private let unitsPreferenceService: UnitsPreferenceServiceProtocol
     private let calendar: Calendar
     private let nowProvider: () -> Date
     private var isSubscribed: Bool
+    private var hydrationObservationTask: Task<Void, Never>?
+    private var goalObservationTask: Task<Void, Never>?
+    private var unitsObservationTask: Task<Void, Never>?
+    private var latestEntries: [HydrationEntry]
+    private var latestGoalMilliliters: Int
 
     internal init(
         hydrationService: HydrationServiceProtocol,
         goalService: GoalServiceProtocol,
+        unitsPreferenceService: UnitsPreferenceServiceProtocol,
         calendar: Calendar = .current,
         nowProvider: @escaping () -> Date = { Date() }
     ) {
         self.hydrationService = hydrationService
         self.goalService = goalService
+        self.unitsPreferenceService = unitsPreferenceService
         self.calendar = calendar
         self.nowProvider = nowProvider
         state = .loading(date: nowProvider())
+        selectedUnit = .milliliters
         isSubscribed = false
+        latestEntries = []
+        latestGoalMilliliters = 0
     }
 
     internal func start() async {
@@ -39,6 +51,35 @@ internal final class TodayViewModel: ObservableObject {
         }
         isSubscribed = true
 
+        unitsObservationTask = Task {
+            await observeUnits()
+        }
+        hydrationObservationTask = Task {
+            await observeHydrationEntries()
+        }
+        goalObservationTask = Task {
+            await observeGoal()
+        }
+    }
+
+    deinit {
+        hydrationObservationTask?.cancel()
+        goalObservationTask?.cancel()
+        unitsObservationTask?.cancel()
+    }
+
+    internal func addQuickAmount(_ quickAddAmount: QuickAddAmount) async throws {
+        let entry = HydrationEntry(
+            id: UUID(),
+            amountMilliliters: quickAddAmount.milliliters,
+            consumedAt: nowProvider(),
+            source: .quickAdd
+        )
+
+        try await hydrationService.upsertEntry(entry)
+    }
+
+    private func observeHydrationEntries() async {
         do {
             let stream = try await hydrationService.observeEntries()
             for await entries in stream {
@@ -46,7 +87,8 @@ internal final class TodayViewModel: ObservableObject {
                     return
                 }
 
-                try await refreshSummary(entries: entries)
+                latestEntries = entries
+                refreshSummaryFromCache()
             }
         } catch {
             guard Task.isCancelled == false else {
@@ -64,20 +106,46 @@ internal final class TodayViewModel: ObservableObject {
         }
     }
 
-    internal func addQuickAmount(_ quickAddAmount: QuickAddAmount) async throws {
-        let entry = HydrationEntry(
-            id: UUID(),
-            amountMilliliters: quickAddAmount.milliliters,
-            consumedAt: nowProvider(),
-            source: .quickAdd
-        )
+    private func observeGoal() async {
+        do {
+            let stream = try await goalService.observeGoal()
+            for await goal in stream {
+                guard Task.isCancelled == false else {
+                    return
+                }
 
-        try await hydrationService.upsertEntry(entry)
+                latestGoalMilliliters = goal?.dailyTargetMilliliters ?? 0
+                refreshSummaryFromCache()
+            }
+        } catch {
+            guard Task.isCancelled == false else {
+                return
+            }
+
+            state = TodayViewState(
+                date: nowProvider(),
+                consumedMilliliters: state.consumedMilliliters,
+                goalMilliliters: state.goalMilliliters,
+                remainingMilliliters: state.remainingMilliliters,
+                progress: state.progress,
+                errorMessage: "Unable to load today's goal."
+            )
+        }
     }
 
-    private func refreshSummary(entries: [HydrationEntry]) async throws {
+    private func observeUnits() async {
+        let stream = await unitsPreferenceService.observeUnit()
+        for await unit in stream {
+            guard Task.isCancelled == false else {
+                return
+            }
+            selectedUnit = unit
+        }
+    }
+
+    private func refreshSummaryFromCache() {
         let now = nowProvider()
-        let todaysEntries = entries.filter { entry in
+        let todaysEntries = latestEntries.filter { entry in
             calendar.isDate(entry.consumedAt, inSameDayAs: now)
         }
 
@@ -85,8 +153,7 @@ internal final class TodayViewModel: ObservableObject {
             partialResult + entry.amountMilliliters
         }
 
-        let goal = try await goalService.fetchGoal()
-        let goalMilliliters = goal?.dailyTargetMilliliters ?? 0
+        let goalMilliliters = latestGoalMilliliters
         let remainingMilliliters = max(goalMilliliters - consumedMilliliters, 0)
 
         let progress: Double

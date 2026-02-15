@@ -11,8 +11,8 @@ import Models
 internal struct HistoryFilterView: View {
     @StateObject private var viewModel: HistoryFilterViewModel
 
-    internal init() {
-        let vm = HistoryFilterViewModel()
+    internal init(serviceContainer: ServiceContainerProtocol) {
+        let vm = HistoryFilterViewModel(historyFilterPreferenceService: serviceContainer.historyFilterPreferenceService)
         _viewModel = StateObject(wrappedValue: vm)
     }
 
@@ -30,7 +30,20 @@ internal struct HistoryFilterView: View {
             }
 
             Section("Time Range") {
-                Picker("Range", selection: $viewModel.selection) {
+                Picker(
+                    "Range",
+                    selection: Binding(
+                        get: { viewModel.selection },
+                        set: { selection in
+                            Task {
+                                guard Task.isCancelled == false else {
+                                    return
+                                }
+                                await viewModel.updateSelection(selection)
+                            }
+                        }
+                    )
+                ) {
                     ForEach(HistoryFilterSelection.allCases) { selection in
                         Text(selection.title).tag(selection)
                     }
@@ -39,15 +52,59 @@ internal struct HistoryFilterView: View {
             }
 
             Section("Sources") {
-                Toggle("Quick Add", isOn: $viewModel.includeQuickAdd)
-                Toggle("Custom Amount", isOn: $viewModel.includeCustomAmount)
-                Toggle("Edited", isOn: $viewModel.includeEdited)
+                Toggle(
+                    "Quick Add",
+                    isOn: Binding(
+                        get: { viewModel.includeQuickAdd },
+                        set: { isOn in
+                            Task {
+                                guard Task.isCancelled == false else {
+                                    return
+                                }
+                                await viewModel.updateIncludeQuickAdd(isOn)
+                            }
+                        }
+                    )
+                )
+                Toggle(
+                    "Custom Amount",
+                    isOn: Binding(
+                        get: { viewModel.includeCustomAmount },
+                        set: { isOn in
+                            Task {
+                                guard Task.isCancelled == false else {
+                                    return
+                                }
+                                await viewModel.updateIncludeCustomAmount(isOn)
+                            }
+                        }
+                    )
+                )
+                Toggle(
+                    "Edited",
+                    isOn: Binding(
+                        get: { viewModel.includeEdited },
+                        set: { isOn in
+                            Task {
+                                guard Task.isCancelled == false else {
+                                    return
+                                }
+                                await viewModel.updateIncludeEdited(isOn)
+                            }
+                        }
+                    )
+                )
             }
 
             if viewModel.hasChanges {
                 Section {
                     Button("Reset", role: .cancel) {
-                        viewModel.reset()
+                        Task {
+                            guard Task.isCancelled == false else {
+                                return
+                            }
+                            await viewModel.reset()
+                        }
                     }
                 }
             }
@@ -55,13 +112,19 @@ internal struct HistoryFilterView: View {
         .scrollContentBackground(.hidden)
         .background(AppTheme.pageGradient)
         .navigationTitle("Filter")
+        .task {
+            guard Task.isCancelled == false else {
+                return
+            }
+            await viewModel.start()
+        }
     }
 }
 
 #if DEBUG
     #Preview {
         NavigationStack {
-            HistoryFilterView()
+            HistoryFilterView(serviceContainer: PreviewServiceContainer())
         }
     }
 #endif

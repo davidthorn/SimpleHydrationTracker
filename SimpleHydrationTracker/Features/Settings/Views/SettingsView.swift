@@ -11,8 +11,7 @@ internal struct SettingsView: View {
     @StateObject private var viewModel: SettingsViewModel
 
     internal init(serviceContainer: ServiceContainerProtocol) {
-        let _ = serviceContainer
-        let vm = SettingsViewModel()
+        let vm = SettingsViewModel(unitsPreferenceService: serviceContainer.unitsPreferenceService)
         _viewModel = StateObject(wrappedValue: vm)
     }
 
@@ -35,7 +34,7 @@ internal struct SettingsView: View {
 
             Section("Preferences") {
                 NavigationLink(value: SettingsRoute.unitsSettings) {
-                    LabeledContent("Units", value: "Milliliters")
+                    LabeledContent("Units", value: viewModel.selectedUnit.settingsValueLabel)
                 }
             }
 

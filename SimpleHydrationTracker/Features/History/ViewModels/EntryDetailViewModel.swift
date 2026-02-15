@@ -16,20 +16,29 @@ internal final class EntryDetailViewModel: ObservableObject {
     @Published internal private(set) var source: HydrationEntrySource?
     @Published internal private(set) var errorMessage: String?
     @Published internal private(set) var isLoading: Bool
+    @Published internal private(set) var selectedUnit: SettingsVolumeUnit
 
     private let entryID: HydrationEntryIdentifier
     private let hydrationService: HydrationServiceProtocol
+    private let unitsPreferenceService: UnitsPreferenceServiceProtocol
     private var originalEntry: HydrationEntry?
     private var hasLoaded: Bool
+    private var unitsObservationTask: Task<Void, Never>?
 
-    internal init(entryID: HydrationEntryIdentifier, hydrationService: HydrationServiceProtocol) {
+    internal init(
+        entryID: HydrationEntryIdentifier,
+        hydrationService: HydrationServiceProtocol,
+        unitsPreferenceService: UnitsPreferenceServiceProtocol
+    ) {
         self.entryID = entryID
         self.hydrationService = hydrationService
+        self.unitsPreferenceService = unitsPreferenceService
         amountText = ""
         consumedAt = Date()
         source = nil
         errorMessage = nil
         isLoading = false
+        selectedUnit = .milliliters
         originalEntry = nil
         hasLoaded = false
     }
@@ -43,7 +52,7 @@ internal final class EntryDetailViewModel: ObservableObject {
             return false
         }
 
-        guard let amount = Int(amountText.trimmingCharacters(in: .whitespacesAndNewlines)), amount > 0 else {
+        guard let amount = selectedUnit.parseAmountText(amountText) else {
             return true
         }
 
@@ -55,11 +64,9 @@ internal final class EntryDetailViewModel: ObservableObject {
             return false
         }
 
-        guard let amount = Int(amountText.trimmingCharacters(in: .whitespacesAndNewlines)), amount > 0 else {
+        guard selectedUnit.parseAmountText(amountText) != nil else {
             return false
         }
-
-        let _ = amount
         return hasChanges
     }
 
@@ -78,6 +85,9 @@ internal final class EntryDetailViewModel: ObservableObject {
 
         hasLoaded = true
         isLoading = true
+        unitsObservationTask = Task {
+            await observeUnits()
+        }
 
         do {
             let entries = try await hydrationService.fetchEntries()
@@ -88,7 +98,7 @@ internal final class EntryDetailViewModel: ObservableObject {
             }
 
             originalEntry = entry
-            amountText = String(entry.amountMilliliters)
+            amountText = selectedUnit.editableAmountText(milliliters: entry.amountMilliliters)
             consumedAt = entry.consumedAt
             source = entry.source
             errorMessage = nil
@@ -105,8 +115,8 @@ internal final class EntryDetailViewModel: ObservableObject {
             return
         }
 
-        guard let amount = Int(amountText.trimmingCharacters(in: .whitespacesAndNewlines)), amount > 0 else {
-            errorMessage = "Enter a valid amount greater than 0 ml."
+        guard let amount = selectedUnit.parseAmountText(amountText) else {
+            errorMessage = "Enter a valid amount greater than 0 \(selectedUnit.shortLabel)."
             return
         }
 
@@ -128,7 +138,7 @@ internal final class EntryDetailViewModel: ObservableObject {
             return
         }
 
-        amountText = String(originalEntry.amountMilliliters)
+        amountText = selectedUnit.editableAmountText(milliliters: originalEntry.amountMilliliters)
         consumedAt = originalEntry.consumedAt
         source = originalEntry.source
         errorMessage = nil
@@ -143,5 +153,26 @@ internal final class EntryDetailViewModel: ObservableObject {
         originalEntry = nil
         source = nil
         errorMessage = nil
+    }
+
+    deinit {
+        unitsObservationTask?.cancel()
+    }
+
+    private func observeUnits() async {
+        let stream = await unitsPreferenceService.observeUnit()
+        for await unit in stream {
+            guard Task.isCancelled == false else {
+                return
+            }
+
+            let hadChanges = hasChanges
+            selectedUnit = unit
+
+            guard hadChanges == false, let originalEntry else {
+                continue
+            }
+            amountText = unit.editableAmountText(milliliters: originalEntry.amountMilliliters)
+        }
     }
 }

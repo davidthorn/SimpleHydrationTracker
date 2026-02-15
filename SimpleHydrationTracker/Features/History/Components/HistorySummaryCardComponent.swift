@@ -11,6 +11,7 @@ internal struct HistorySummaryCardComponent: View {
     internal let date: Date
     internal let totalMilliliters: Int
     internal let entryCount: Int
+    internal let selectedUnit: SettingsVolumeUnit
 
     internal var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -19,7 +20,7 @@ internal struct HistorySummaryCardComponent: View {
                 .foregroundStyle(.primary)
 
             HStack(spacing: 10) {
-                historyMetric(title: "Total", value: "\(totalMilliliters) ml")
+                historyMetric(title: "Total", value: selectedUnit.format(milliliters: totalMilliliters))
                 historyMetric(title: "Entries", value: "\(entryCount)")
             }
         }
@@ -53,7 +54,8 @@ internal struct HistorySummaryCardComponent: View {
         HistorySummaryCardComponent(
             date: Date(),
             totalMilliliters: 2050,
-            entryCount: 7
+            entryCount: 7,
+            selectedUnit: .milliliters
         )
         .padding()
         .background(AppTheme.pageGradient)

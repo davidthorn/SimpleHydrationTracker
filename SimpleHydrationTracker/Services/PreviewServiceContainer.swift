@@ -14,12 +14,14 @@
         internal let goalService: GoalServiceProtocol
         internal let reminderService: ReminderServiceProtocol
         internal let unitsPreferenceService: UnitsPreferenceServiceProtocol
+        internal let historyFilterPreferenceService: HistoryFilterPreferenceServiceProtocol
 
         internal init() {
             hydrationService = PreviewHydrationService()
             goalService = PreviewGoalService()
             reminderService = PreviewReminderService()
             unitsPreferenceService = PreviewUnitsPreferenceService()
+            historyFilterPreferenceService = PreviewHistoryFilterPreferenceService()
         }
     }
 
@@ -101,5 +103,21 @@
         internal func updateUnit(_ unit: SettingsVolumeUnit) async {}
 
         internal func resetUnit() async {}
+    }
+
+    internal actor PreviewHistoryFilterPreferenceService: HistoryFilterPreferenceServiceProtocol {
+        internal func observePreferences() async -> AsyncStream<HistoryFilterPreferences> {
+            let streamPair = AsyncStream<HistoryFilterPreferences>.makeStream()
+            streamPair.continuation.yield(.default)
+            return streamPair.stream
+        }
+
+        internal func fetchPreferences() async -> HistoryFilterPreferences {
+            .default
+        }
+
+        internal func updatePreferences(_ preferences: HistoryFilterPreferences) async {}
+
+        internal func resetPreferences() async {}
     }
 #endif

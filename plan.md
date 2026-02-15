@@ -556,21 +556,64 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <settings preference service files>
-- <today/history viewmodel files>
-- <today/history view files>
+- Models/HistoryDaySummary.swift
+- Models/HistoryFilterPreferences.swift
+- Models/HistoryFilterSelection.swift
+- SimpleHydrationTracker/Features/Settings/Models/SettingsVolumeUnit+Display.swift
+- SimpleHydrationTracker/Features/Settings/Routes/GoalSettingsView.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/GoalSettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/SettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/Views/SettingsView.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/AddCustomAmountViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/TodayViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/DayDetailViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/EditTodayEntryViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/GoalSetupViewModel.swift
+- SimpleHydrationTracker/Features/Today/Views/AddCustomAmountView.swift
+- SimpleHydrationTracker/Features/Today/Views/EditTodayEntryView.swift
+- SimpleHydrationTracker/Features/Today/Views/GoalSetupView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayProgressCardView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayQuickAddSectionView.swift
+- SimpleHydrationTracker/Features/Today/Views/DayDetailView.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryFilterViewModel.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryViewModel.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryDayDetailViewModel.swift
+- SimpleHydrationTracker/Features/History/ViewModels/EntryDetailViewModel.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryFilterView.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryView.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryDayDetailView.swift
+- SimpleHydrationTracker/Features/History/Views/EntryDetailView.swift
+- SimpleHydrationTracker/Features/History/Components/HistoryDayRowComponent.swift
+- SimpleHydrationTracker/Features/History/Components/HistorySummaryCardComponent.swift
+- SimpleHydrationTracker/Features/History/Components/HistoryEntryRowComponent.swift
+- SimpleHydrationTracker/Protocols/HistoryFilterPreferenceServiceProtocol.swift
+- SimpleHydrationTracker/Protocols/ServiceContainerProtocol.swift
+- SimpleHydrationTracker/Scenes/History/HistoryScene.swift
+- SimpleHydrationTracker/Services/HistoryFilterPreferenceService.swift
+- SimpleHydrationTracker/Services/PreviewServiceContainer.swift
+- SimpleHydrationTracker/Services/ServiceContainer.swift
 - plan.md
 
 Completed:
-- Implemented app-wide preference consumption so settings are not isolated to Settings routes.
-- Wired Today and History feature view models to observe and apply preference streams.
-- Ensured preference updates propagate live without requiring app relaunch.
-- Added fallback/default behavior when preference data is unavailable or invalid.
-- Added error-state handling where preference-driven rendering can fail.
+- Added shared `SettingsVolumeUnit` display/format extension for consistent ml/oz value rendering.
+- Expanded unit conversion helpers to support form parsing/edit formatting for both ml and oz inputs.
+- Wired Settings, Today, and History route view models to observe units preference streams via `UnitsPreferenceServiceProtocol`.
+- Updated Today and History views/components to render hydration amounts and form labels using the selected unit.
+- Added unit-aware keyboard/input behavior for amount and goal forms (`decimalPad` for oz, parsing to persisted ml values).
+- Implemented persisted history filter preferences (`HistoryFilterPreferences`) with async observation and UserDefaults backing.
+- Wired History filter route toggles/range to persistence so changes are remembered across navigation and app relaunch.
+- Applied persisted filter settings in both History list and Day Detail projections, including source filtering.
+- Added Filter access from Day Detail toolbar.
+- Wired Today to observe goal stream updates so progress/remaining summary reacts immediately when goals change.
+- Wired History to observe goal stream updates and project goal status metadata per day.
+- Added goal-status UI in History day rows (reached/missed/no-goal) with visual icon + highlight treatment.
+- Kept default fallback behavior at `.milliliters` when preference values are missing/invalid.
 
 Verification:
-- Manual QA pass confirms Today/History react immediately to preference changes.
-- Preference changes persist, reload on launch, and apply across relevant feature screens.
+- Manual QA pass confirms units and goal updates react immediately across Today/History routes.
+- History filter choices persist, reload on launch, and are applied in both list and day-detail routes.
+- Goal status indicators in History rows update when goal settings change.
 - `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 

@@ -13,22 +13,29 @@ import Models
 internal final class DayDetailViewModel: ObservableObject {
     @Published internal private(set) var entries: [HydrationEntry]
     @Published internal private(set) var errorMessage: String?
+    @Published internal private(set) var selectedUnit: SettingsVolumeUnit
 
     private let dayID: HydrationDayIdentifier
     private let hydrationService: HydrationServiceProtocol
+    private let unitsPreferenceService: UnitsPreferenceServiceProtocol
     private let calendar: Calendar
     private var hasStarted: Bool
+    private var entriesObservationTask: Task<Void, Never>?
+    private var unitsObservationTask: Task<Void, Never>?
 
     internal init(
         dayID: HydrationDayIdentifier,
         hydrationService: HydrationServiceProtocol,
+        unitsPreferenceService: UnitsPreferenceServiceProtocol,
         calendar: Calendar = .current
     ) {
         self.dayID = dayID
         self.hydrationService = hydrationService
+        self.unitsPreferenceService = unitsPreferenceService
         self.calendar = calendar
         entries = []
         errorMessage = nil
+        selectedUnit = .milliliters
         hasStarted = false
     }
 
@@ -44,6 +51,20 @@ internal final class DayDetailViewModel: ObservableObject {
         }
         hasStarted = true
 
+        unitsObservationTask = Task {
+            await observeUnits()
+        }
+        entriesObservationTask = Task {
+            await observeEntries()
+        }
+    }
+
+    deinit {
+        entriesObservationTask?.cancel()
+        unitsObservationTask?.cancel()
+    }
+
+    private func observeEntries() async {
         do {
             let stream = try await hydrationService.observeEntries()
             for await allEntries in stream {
@@ -64,6 +85,16 @@ internal final class DayDetailViewModel: ObservableObject {
             }
 
             errorMessage = "Unable to load entries for this day."
+        }
+    }
+
+    private func observeUnits() async {
+        let stream = await unitsPreferenceService.observeUnit()
+        for await unit in stream {
+            guard Task.isCancelled == false else {
+                return
+            }
+            selectedUnit = unit
         }
     }
 }

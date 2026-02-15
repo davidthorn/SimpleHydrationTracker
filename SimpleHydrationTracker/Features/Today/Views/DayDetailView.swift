@@ -16,14 +16,18 @@ internal struct DayDetailView: View {
 
     internal init(dayID: HydrationDayIdentifier, serviceContainer: ServiceContainerProtocol) {
         self.dayID = dayID
-        let vm = DayDetailViewModel(dayID: dayID, hydrationService: serviceContainer.hydrationService)
+        let vm = DayDetailViewModel(
+            dayID: dayID,
+            hydrationService: serviceContainer.hydrationService,
+            unitsPreferenceService: serviceContainer.unitsPreferenceService
+        )
         _viewModel = StateObject(wrappedValue: vm)
     }
 
     internal var body: some View {
         List {
             Section("Summary") {
-                Text("Total: \(viewModel.totalMilliliters) ml")
+                Text("Total: \(viewModel.selectedUnit.format(milliliters: viewModel.totalMilliliters))")
             }
 
             Section("Entries") {
@@ -33,7 +37,7 @@ internal struct DayDetailView: View {
                 } else {
                     ForEach(viewModel.entries) { entry in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("\(entry.amountMilliliters) ml")
+                            Text(viewModel.selectedUnit.format(milliliters: entry.amountMilliliters))
                                 .font(.headline)
                             Text(entry.consumedAt.formatted(date: .abbreviated, time: .shortened))
                                 .font(.caption)

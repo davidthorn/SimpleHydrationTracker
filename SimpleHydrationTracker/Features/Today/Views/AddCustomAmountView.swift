@@ -13,7 +13,10 @@ internal struct AddCustomAmountView: View {
     @State private var isSaving: Bool
 
     internal init(serviceContainer: ServiceContainerProtocol) {
-        let vm = AddCustomAmountViewModel(hydrationService: serviceContainer.hydrationService)
+        let vm = AddCustomAmountViewModel(
+            hydrationService: serviceContainer.hydrationService,
+            unitsPreferenceService: serviceContainer.unitsPreferenceService
+        )
         _viewModel = StateObject(wrappedValue: vm)
         _isSaving = State(initialValue: false)
     }
@@ -21,8 +24,11 @@ internal struct AddCustomAmountView: View {
     internal var body: some View {
         Form {
             Section("Amount") {
-                TextField("Milliliters", text: $viewModel.amountText)
-                    .keyboardType(.numberPad)
+                TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.amountText)
+                    .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
+                Text("Unit: \(viewModel.selectedUnit.shortLabel)")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.muted)
             }
 
             Section("When") {
@@ -37,6 +43,12 @@ internal struct AddCustomAmountView: View {
             }
         }
         .navigationTitle("Add Amount")
+        .task {
+            guard Task.isCancelled == false else {
+                return
+            }
+            await viewModel.start()
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.canSave {

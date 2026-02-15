@@ -10,13 +10,16 @@ import Models
 
 internal struct TodayQuickAddSectionView: View {
     private let quickAddOptions: [QuickAddAmount]
+    private let selectedUnit: SettingsVolumeUnit
     private let onQuickAddTap: (QuickAddAmount) -> Void
 
     internal init(
         quickAddOptions: [QuickAddAmount],
+        selectedUnit: SettingsVolumeUnit,
         onQuickAddTap: @escaping (QuickAddAmount) -> Void
     ) {
         self.quickAddOptions = quickAddOptions
+        self.selectedUnit = selectedUnit
         self.onQuickAddTap = onQuickAddTap
     }
 
@@ -37,7 +40,7 @@ internal struct TodayQuickAddSectionView: View {
                     Button {
                         onQuickAddTap(amount)
                     } label: {
-                        Text(amount.displayLabel)
+                        Text(selectedUnit.format(milliliters: amount.milliliters))
                             .font(.subheadline.weight(.semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -62,7 +65,10 @@ internal struct TodayQuickAddSectionView: View {
 
 #if DEBUG
     #Preview {
-        TodayQuickAddSectionView(quickAddOptions: QuickAddAmount.allCases) { _ in }
+        TodayQuickAddSectionView(
+            quickAddOptions: QuickAddAmount.allCases,
+            selectedUnit: .milliliters
+        ) { _ in }
             .padding()
     }
 #endif
