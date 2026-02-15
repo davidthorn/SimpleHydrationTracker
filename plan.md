@@ -345,17 +345,23 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <history viewmodel file>
-- <history view files>
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryDaySummary.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryViewModel.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryView.swift
+- SimpleHydrationTracker/Scenes/History/HistoryScene.swift
+- SimpleHydrationTracker/ContentView.swift
 
 Completed:
 - Added history projection by day from persisted entries.
 - Added list UI optimized for fast scanning.
 - Added empty and error states for history loading/render failures.
+- Wired HistoryScene/HistoryView to service-container dependency injection.
+- Added route navigation from day rows to History day detail route.
 
 Verification:
 - History shows correct day groups from stored data.
 - History error states are presented in UI and recover on retry/reopen.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
 ### Task 5.2 - History child routes implementation

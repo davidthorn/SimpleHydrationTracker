@@ -21,7 +21,7 @@ internal struct ContentView: View {
                     Label("Today", systemImage: "drop.fill")
                 }
 
-            HistoryScene()
+            HistoryScene(serviceContainer: serviceContainer)
                 .tabItem {
                     Label("History", systemImage: "calendar")
                 }
