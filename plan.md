@@ -403,6 +403,47 @@ Verification:
 - `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
+### Task 5.3 - History UI/UX and design implementation (staging-ready)
+Planned commit subject:
+`feat(history-ui): complete history ux and visual design for staging readiness`
+
+Post-completion commit body:
+```text
+Files changed:
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryViewModel.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryDayDetailViewModel.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryView.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryDayDetailView.swift
+- SimpleHydrationTracker/Features/History/Views/EntryDetailView.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryFilterView.swift
+- SimpleHydrationTracker/Theme/AppTheme.swift
+- SimpleHydrationTracker/Features/History/Components/HistoryDayRowComponent.swift
+- SimpleHydrationTracker/Features/History/Components/HistoryEntryRowComponent.swift
+- SimpleHydrationTracker/Features/History/Components/HistorySummaryCardComponent.swift
+- SimpleHydrationTracker/Features/History/Components/HistoryStatusCardComponent.swift
+- plan.md
+
+Completed:
+- Applied History feature UI/UX and visual design rules to all Stage 5 screens.
+- Ensured non-default, clean-cut, intuitive visual hierarchy across History root and child routes.
+- Added/updated reusable Components for complex body sections to keep views maintainable.
+- Ensured editable forms in History routes follow `$swift` save/reset/delete + delete confirmation behavior.
+- Ensured loading, empty, and error states are explicit, actionable, and visually consistent.
+- Ensured all async UI actions are Task-driven in Views with cancellation guards where side effects can occur.
+- Completed rule-by-rule `$swift` compliance check for Stage 5 deliverables:
+- [pass] single TabView remains owned by app root.
+- [pass] Scene-owned navigation destinations retained in HistoryScene.
+- [pass] ViewModels remain owned by Views using StateObject init pattern.
+- [pass] Async side-effect actions use Task from View with Task.isCancelled guards.
+- [pass] Form edit/delete UX in EntryDetailView preserves save/reset/delete + confirmation flow.
+- [pass] Data structures/components follow one-type-per-file organization with previews.
+
+Verification:
+- Manual QA pass for History flows: list, day detail, entry detail, filter, edit, delete confirm/cancel.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
+- Stage 5 marked staging-ready only after design + UX + behavior checks all pass.
+```
+
 ---
 
 ## Stage 6 - Settings and Reminder Services

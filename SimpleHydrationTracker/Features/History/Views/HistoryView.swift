@@ -18,35 +18,52 @@ internal struct HistoryView: View {
     }
 
     internal var body: some View {
-        List {
-            if viewModel.daySummaries.isEmpty {
-                Text("No hydration history yet.")
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(viewModel.daySummaries) { daySummary in
-                    NavigationLink(value: HistoryRoute.dayDetail(dayID: daySummary.dayID)) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(daySummary.date.formatted(date: .abbreviated, time: .omitted))
-                                .font(.headline)
-                            Text("\(daySummary.totalMilliliters) ml • \(daySummary.entryCount) entries")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+        ZStack {
+            AppTheme.pageGradient
+                .ignoresSafeArea()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    if viewModel.isLoading {
+                        ProgressView("Loading history...")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 20)
+                    }
+
+                    if let errorMessage = viewModel.errorMessage {
+                        HistoryStatusCardComponent(
+                            title: "Unable to Load History",
+                            message: errorMessage,
+                            systemImage: "exclamationmark.triangle.fill",
+                            tint: AppTheme.error
+                        )
+                    }
+
+                    if viewModel.daySummaries.isEmpty, viewModel.isLoading == false {
+                        HistoryStatusCardComponent(
+                            title: "No History Yet",
+                            message: "Log water from Today and your daily history will appear here.",
+                            systemImage: "drop",
+                            tint: AppTheme.accent
+                        )
+                    } else {
+                        ForEach(viewModel.daySummaries) { daySummary in
+                            NavigationLink(value: HistoryRoute.dayDetail(dayID: daySummary.dayID)) {
+                                HistoryDayRowComponent(summary: daySummary)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .padding(.vertical, 4)
                     }
                 }
-            }
-
-            if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
-                    .foregroundStyle(.red)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
         }
         .navigationTitle("History")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink(value: HistoryRoute.historyFilter) {
-                    Text("Filter")
+                    Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
                 }
             }
         }

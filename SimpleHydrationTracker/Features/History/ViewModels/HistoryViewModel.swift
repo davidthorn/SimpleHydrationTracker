@@ -13,6 +13,7 @@ import Models
 internal final class HistoryViewModel: ObservableObject {
     @Published internal private(set) var daySummaries: [HistoryDaySummary]
     @Published internal private(set) var errorMessage: String?
+    @Published internal private(set) var isLoading: Bool
 
     private let hydrationService: HydrationServiceProtocol
     private let calendar: Calendar
@@ -26,6 +27,7 @@ internal final class HistoryViewModel: ObservableObject {
         self.calendar = calendar
         daySummaries = []
         errorMessage = nil
+        isLoading = false
         hasStarted = false
     }
 
@@ -34,6 +36,7 @@ internal final class HistoryViewModel: ObservableObject {
             return
         }
         hasStarted = true
+        isLoading = true
 
         do {
             let stream = try await hydrationService.observeEntries()
@@ -44,6 +47,7 @@ internal final class HistoryViewModel: ObservableObject {
 
                 daySummaries = projectDaySummaries(from: entries)
                 errorMessage = nil
+                isLoading = false
             }
         } catch {
             guard Task.isCancelled == false else {
@@ -51,6 +55,7 @@ internal final class HistoryViewModel: ObservableObject {
             }
 
             errorMessage = "Unable to load hydration history."
+            isLoading = false
         }
     }
 

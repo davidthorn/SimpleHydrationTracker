@@ -32,21 +32,23 @@ internal struct EntryDetailView: View {
             Section("Amount") {
                 TextField("Milliliters", text: $viewModel.amountText)
                     .keyboardType(.numberPad)
+                    .disabled(viewModel.isLoading || isSaving || isDeleting)
             }
 
             Section("When") {
                 DatePicker("Consumed At", selection: $viewModel.consumedAt)
+                    .disabled(viewModel.isLoading || isSaving || isDeleting)
             }
 
             Section("Source") {
-                Text(viewModel.source?.rawValue ?? "Unknown")
+                Text(viewModel.source?.displayTitle ?? "Unknown")
                     .textCase(.none)
             }
 
             if let errorMessage = viewModel.errorMessage {
                 Section {
                     Text(errorMessage)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(AppTheme.error)
                 }
             }
 
@@ -55,6 +57,7 @@ internal struct EntryDetailView: View {
                     Button("Reset", role: .cancel) {
                         viewModel.resetChanges()
                     }
+                    .disabled(isSaving || isDeleting)
                 }
             }
 
@@ -67,6 +70,8 @@ internal struct EntryDetailView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .navigationTitle("Entry Detail")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -123,6 +128,13 @@ internal struct EntryDetailView: View {
                 return
             }
             await viewModel.loadIfNeeded()
+        }
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView("Loading entry...")
+                    .padding(16)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
         }
     }
 }

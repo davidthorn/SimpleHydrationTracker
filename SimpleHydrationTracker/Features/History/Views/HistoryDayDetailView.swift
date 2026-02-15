@@ -21,39 +21,53 @@ internal struct HistoryDayDetailView: View {
     }
 
     internal var body: some View {
-        List {
-            Section("Summary") {
-                Text("Total: \(viewModel.totalMilliliters) ml")
-                Text("Entries: \(viewModel.entries.count)")
-            }
+        ZStack {
+            AppTheme.pageGradient
+                .ignoresSafeArea()
 
-            Section("Entries") {
-                if viewModel.entries.isEmpty {
-                    Text("No hydration entries for this day.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(viewModel.entries) { entry in
-                        NavigationLink(
-                            value: HistoryRoute.entryDetail(entryID: HydrationEntryIdentifier(value: entry.id))
-                        ) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("\(entry.amountMilliliters) ml")
-                                    .font(.headline)
-                                Text(entry.consumedAt.formatted(date: .omitted, time: .shortened))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    if viewModel.isLoading {
+                        ProgressView("Loading day details...")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 20)
+                    }
+
+                    HistorySummaryCardComponent(
+                        date: dayID.value,
+                        totalMilliliters: viewModel.totalMilliliters,
+                        entryCount: viewModel.entries.count
+                    )
+
+                    if let errorMessage = viewModel.errorMessage {
+                        HistoryStatusCardComponent(
+                            title: "Unable to Load Day",
+                            message: errorMessage,
+                            systemImage: "exclamationmark.triangle.fill",
+                            tint: AppTheme.error
+                        )
+                    }
+
+                    if viewModel.entries.isEmpty, viewModel.isLoading == false {
+                        HistoryStatusCardComponent(
+                            title: "No Entries",
+                            message: "There are no hydration entries for this day.",
+                            systemImage: "drop",
+                            tint: AppTheme.accent
+                        )
+                    } else {
+                        ForEach(viewModel.entries) { entry in
+                            NavigationLink(
+                                value: HistoryRoute.entryDetail(entryID: HydrationEntryIdentifier(value: entry.id))
+                            ) {
+                                HistoryEntryRowComponent(entry: entry)
                             }
-                            .padding(.vertical, 4)
+                            .buttonStyle(.plain)
                         }
                     }
                 }
-            }
-
-            if let errorMessage = viewModel.errorMessage {
-                Section {
-                    Text(errorMessage)
-                        .foregroundStyle(.red)
-                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
         }
         .navigationTitle("Day Detail")

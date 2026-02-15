@@ -18,6 +18,17 @@ internal struct HistoryFilterView: View {
 
     internal var body: some View {
         Form {
+            Section {
+                HistoryStatusCardComponent(
+                    title: "History Filter",
+                    message: "Adjust what appears in history to focus on specific data.",
+                    systemImage: "line.3.horizontal.decrease.circle",
+                    tint: AppTheme.accent
+                )
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+            }
+
             Section("Time Range") {
                 Picker("Range", selection: $viewModel.selection) {
                     ForEach(HistoryFilterSelection.allCases) { selection in
@@ -41,6 +52,8 @@ internal struct HistoryFilterView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .navigationTitle("Filter")
     }
 }
