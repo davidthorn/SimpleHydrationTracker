@@ -456,17 +456,21 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <settings viewmodel file>
-- <settings view files>
+- SimpleHydrationTracker/Features/Settings/ViewModels/SettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/Views/SettingsView.swift
 
 Completed:
 - Added settings root view model/state.
 - Added route links for goal, reminder, permissions, units, and data management.
 - Added settings-level error presentation pattern for failed preference writes.
+- Wired SettingsView to own its ViewModel via StateObject init pattern.
+- Added loading indicator state for settings root initialization.
+- Added inline + alert error presentation bindings and dismiss flow for settings-level failures.
 
 Verification:
 - Settings routes present correctly.
 - Preference write failures are shown in UI and do not silently fail.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
 ### Task 6.2 - Reminder service protocol and implementation
