@@ -33,6 +33,17 @@ internal struct EditTodayEntryView: View {
 
     internal var body: some View {
         Form {
+            Section {
+                TodayHeroCardComponent(
+                    title: "Edit Entry",
+                    message: "Adjust amount or time, then save your updated log.",
+                    systemImage: "pencil.circle.fill",
+                    tint: AppTheme.warning
+                )
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                .listRowBackground(Color.clear)
+            }
+
             Section("Amount") {
                 TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.amountText)
                     .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
@@ -47,8 +58,14 @@ internal struct EditTodayEntryView: View {
 
             if let errorMessage = viewModel.errorMessage {
                 Section {
-                    Text(errorMessage)
-                        .foregroundStyle(.red)
+                    TodayStatusCardComponent(
+                        title: "Unable to Update Entry",
+                        message: errorMessage,
+                        systemImage: "exclamationmark.triangle.fill",
+                        tint: AppTheme.error
+                    )
+                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                    .listRowBackground(Color.clear)
                 }
             }
 
@@ -70,6 +87,8 @@ internal struct EditTodayEntryView: View {
             }
         }
         .navigationTitle("Edit Entry")
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.canSave {

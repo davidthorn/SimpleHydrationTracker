@@ -9,38 +9,83 @@ import Models
 import SwiftUI
 
 internal struct TodayRouteLinksSectionView: View {
-    internal init() {}
+    private let currentDayID: HydrationDayIdentifier
+    private let latestEntryID: HydrationEntryIdentifier?
+
+    internal init(currentDayID: HydrationDayIdentifier, latestEntryID: HydrationEntryIdentifier?) {
+        self.currentDayID = currentDayID
+        self.latestEntryID = latestEntryID
+    }
 
     internal var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("More")
-                .font(.headline)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("More")
+                    .font(.headline)
+                Text("Jump to detailed actions and configuration.")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.muted)
+            }
 
             NavigationLink(value: TodayRoute.addCustomAmount) {
-                TodayRouteRowComponent(title: "Add Custom Amount", systemImage: "plus.circle")
+                TodayRouteRowComponent(
+                    title: "Add Custom Amount",
+                    subtitle: "Log a specific intake",
+                    systemImage: "plus.circle",
+                    tint: AppTheme.accent
+                )
+            }
+            .buttonStyle(.plain)
+
+            if let latestEntryID {
+                NavigationLink(value: TodayRoute.editTodayEntry(entryID: latestEntryID)) {
+                    TodayRouteRowComponent(
+                        title: "Edit Latest Entry",
+                        subtitle: "Update your most recent log",
+                        systemImage: "pencil",
+                        tint: AppTheme.warning
+                    )
+                }
+                .buttonStyle(.plain)
+            } else {
+                TodayRouteRowComponent(
+                    title: "Edit Latest Entry",
+                    subtitle: "Add water first to enable editing",
+                    systemImage: "pencil",
+                    tint: AppTheme.warning,
+                    isEnabled: false
+                )
             }
 
-            NavigationLink(
-                value: TodayRoute.editTodayEntry(entryID: HydrationEntryIdentifier(value: UUID()))
-            ) {
-                TodayRouteRowComponent(title: "Edit Today Entry", systemImage: "pencil")
+            NavigationLink(value: TodayRoute.dayDetail(dayID: currentDayID)) {
+                TodayRouteRowComponent(
+                    title: "Day Detail",
+                    subtitle: "Review today's timeline",
+                    systemImage: "calendar",
+                    tint: AppTheme.success
+                )
             }
-
-            NavigationLink(
-                value: TodayRoute.dayDetail(dayID: HydrationDayIdentifier(value: Date()))
-            ) {
-                TodayRouteRowComponent(title: "Day Detail", systemImage: "calendar")
-            }
+            .buttonStyle(.plain)
 
             NavigationLink(value: TodayRoute.goalSetup) {
-                TodayRouteRowComponent(title: "Goal Setup", systemImage: "target")
+                TodayRouteRowComponent(
+                    title: "Goal Setup",
+                    subtitle: "Set your daily hydration target",
+                    systemImage: "target",
+                    tint: AppTheme.accent
+                )
             }
+            .buttonStyle(.plain)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(.secondarySystemBackground))
+                .fill(AppTheme.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.black.opacity(0.05), lineWidth: 1)
+                )
         )
     }
 }
@@ -48,8 +93,12 @@ internal struct TodayRouteLinksSectionView: View {
 #if DEBUG
     #Preview {
         NavigationStack {
-            TodayRouteLinksSectionView()
+            TodayRouteLinksSectionView(
+                currentDayID: HydrationDayIdentifier(value: Date()),
+                latestEntryID: HydrationEntryIdentifier(value: UUID())
+            )
                 .padding()
+                .background(AppTheme.pageGradient)
         }
     }
 #endif

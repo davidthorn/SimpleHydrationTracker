@@ -23,6 +23,17 @@ internal struct AddCustomAmountView: View {
 
     internal var body: some View {
         Form {
+            Section {
+                TodayHeroCardComponent(
+                    title: "Add Custom Amount",
+                    message: "Log any amount for precise daily tracking.",
+                    systemImage: "plus.circle.fill",
+                    tint: AppTheme.accent
+                )
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                .listRowBackground(Color.clear)
+            }
+
             Section("Amount") {
                 TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.amountText)
                     .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
@@ -37,12 +48,20 @@ internal struct AddCustomAmountView: View {
 
             if let errorMessage = viewModel.errorMessage {
                 Section {
-                    Text(errorMessage)
-                        .foregroundStyle(.red)
+                    TodayStatusCardComponent(
+                        title: "Unable to Save",
+                        message: errorMessage,
+                        systemImage: "exclamationmark.triangle.fill",
+                        tint: AppTheme.error
+                    )
+                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                    .listRowBackground(Color.clear)
                 }
             }
         }
         .navigationTitle("Add Amount")
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .task {
             guard Task.isCancelled == false else {
                 return

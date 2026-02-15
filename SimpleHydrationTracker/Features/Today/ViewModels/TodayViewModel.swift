@@ -13,6 +13,8 @@ import Models
 internal final class TodayViewModel: ObservableObject {
     @Published internal private(set) var state: TodayViewState
     @Published internal private(set) var selectedUnit: SettingsVolumeUnit
+    @Published internal private(set) var latestEntryID: HydrationEntryIdentifier?
+    @Published internal private(set) var intakeChartData: TodayIntakeChartData
 
     private let hydrationService: HydrationServiceProtocol
     private let goalService: GoalServiceProtocol
@@ -40,6 +42,8 @@ internal final class TodayViewModel: ObservableObject {
         self.nowProvider = nowProvider
         state = .loading(date: nowProvider())
         selectedUnit = .milliliters
+        latestEntryID = nil
+        intakeChartData = .empty()
         isSubscribed = false
         latestEntries = []
         latestGoalMilliliters = 0
@@ -152,6 +156,13 @@ internal final class TodayViewModel: ObservableObject {
         let consumedMilliliters = todaysEntries.reduce(0) { partialResult, entry in
             partialResult + entry.amountMilliliters
         }
+        let latestEntry = todaysEntries.sorted(by: { lhs, rhs in
+            lhs.consumedAt > rhs.consumedAt
+        }).first
+        latestEntryID = latestEntry.map { entry in
+            HydrationEntryIdentifier(value: entry.id)
+        }
+        intakeChartData = buildChartData(from: todaysEntries)
 
         let goalMilliliters = latestGoalMilliliters
         let remainingMilliliters = max(goalMilliliters - consumedMilliliters, 0)
@@ -171,5 +182,59 @@ internal final class TodayViewModel: ObservableObject {
             progress: progress,
             errorMessage: nil
         )
+    }
+
+    private func buildChartData(from entries: [HydrationEntry]) -> TodayIntakeChartData {
+        guard entries.isEmpty == false else {
+            return .empty()
+        }
+
+        let sortedEntries = entries.sorted(by: { lhs, rhs in
+            lhs.consumedAt < rhs.consumedAt
+        })
+        let firstDate = sortedEntries.first?.consumedAt ?? nowProvider()
+        let lastDate = sortedEntries.last?.consumedAt ?? firstDate
+        let span = lastDate.timeIntervalSince(firstDate)
+        let scale = chartScale(for: span)
+
+        let groupedEntries = Dictionary(grouping: entries) { entry in
+            bucketStartDate(for: entry.consumedAt, scale: scale)
+        }
+
+        let points = groupedEntries
+            .map { bucketStart, grouped in
+                let totalMilliliters = grouped.reduce(0) { partialResult, entry in
+                    partialResult + entry.amountMilliliters
+                }
+                return TodayIntakeChartPoint(hourStart: bucketStart, totalMilliliters: totalMilliliters)
+            }
+            .sorted(by: { lhs, rhs in
+                lhs.hourStart < rhs.hourStart
+            })
+
+        return TodayIntakeChartData(points: points, scale: scale)
+    }
+
+    private func chartScale(for span: TimeInterval) -> TodayIntakeChartScale {
+        if span <= 2 * 60 * 60 {
+            return .fiveMinutes
+        }
+
+        if span <= 6 * 60 * 60 {
+            return .fifteenMinutes
+        }
+
+        if span <= 12 * 60 * 60 {
+            return .thirtyMinutes
+        }
+
+        return .hourly
+    }
+
+    private func bucketStartDate(for date: Date, scale: TodayIntakeChartScale) -> Date {
+        let bucketSeconds = scale.bucketSeconds
+        let rawValue = date.timeIntervalSinceReferenceDate
+        let bucketStart = floor(rawValue / bucketSeconds) * bucketSeconds
+        return Date(timeIntervalSinceReferenceDate: bucketStart)
     }
 }

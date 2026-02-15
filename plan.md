@@ -666,17 +666,41 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <today view files>
-- <today component files>
-- <theme files if required>
+- SimpleHydrationTracker/Features/Today/ViewModels/TodayViewModel.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayProgressCardView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayQuickAddSectionView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayRouteLinksSectionView.swift
+- SimpleHydrationTracker/Features/Today/Views/AddCustomAmountView.swift
+- SimpleHydrationTracker/Features/Today/Views/EditTodayEntryView.swift
+- SimpleHydrationTracker/Features/Today/Views/GoalSetupView.swift
+- SimpleHydrationTracker/Features/Today/Views/DayDetailView.swift
+- SimpleHydrationTracker/Features/Today/Models/TodayIntakeChartPoint.swift
+- SimpleHydrationTracker/Features/Today/Models/TodayIntakeChartScale.swift
+- SimpleHydrationTracker/Features/Today/Models/TodayIntakeChartData.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayHeroCardComponent.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayStatusCardComponent.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayDayEntryRowComponent.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayRouteRowComponent.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayIntakeChartCardComponent.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayToastComponent.swift
+- SimpleHydrationTracker/Components/TodayRouteRowComponent.swift (deleted)
 - plan.md
 
 Completed:
 - Applied app-level design constraints to all TodayScene surfaces and routes.
 - Ensured non-default, inspiring, intuitive visual hierarchy for progress, quick-add, and navigation actions.
-- Added/updated reusable Components for complex Today view sections to keep bodies maintainable.
-- Ensured loading, empty, and error states are explicit, actionable, and visually consistent.
-- Ensured form interactions follow $swift requirements (save/reset/delete visibility rules + delete confirmations where applicable).
+- Added/updated reusable Components for hero, status, route-row, and day-entry patterns to keep Today views maintainable.
+- Added a dedicated bar chart card below Quick Add to visualize hydration intake for the current day.
+- Implemented adaptive chart bucket sizing from first-to-last entry span (5m / 15m / 30m / 60m scales).
+- Tuned X-axis label stride so short windows remain readable while preserving detailed bar granularity.
+- Converted Today root and day-detail surfaces to gradient-backed card layouts with explicit empty/error feedback.
+- Upgraded form routes (Add Amount, Edit Entry, Goal Setup) with consistent hero/status cards and hidden form backgrounds.
+- Wired route links to use real current-day and latest-entry context; edit route now shows a disabled guidance row until an entry exists.
+- Enabled Day Detail rows to navigate directly to the entry detail/editor route for the tapped entry.
+- Added animated Quick Add success toast confirmation with auto-dismiss.
+- Kept form interactions aligned with $swift save/reset/delete visibility rules and delete confirmations.
+- Moved Today-specific route row component out of the app-level `Components` folder into `Features/Today/Components`.
 
 Verification:
 - Manual QA for Today flows and route navigation.

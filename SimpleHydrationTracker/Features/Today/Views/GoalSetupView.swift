@@ -27,6 +27,17 @@ internal struct GoalSetupView: View {
 
     internal var body: some View {
         Form {
+            Section {
+                TodayHeroCardComponent(
+                    title: "Goal Setup",
+                    message: "Define the target that drives your Today progress.",
+                    systemImage: "target",
+                    tint: AppTheme.accent
+                )
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                .listRowBackground(Color.clear)
+            }
+
             Section("Daily Goal") {
                 TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.goalText)
                     .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
@@ -37,8 +48,14 @@ internal struct GoalSetupView: View {
 
             if let errorMessage = viewModel.errorMessage {
                 Section {
-                    Text(errorMessage)
-                        .foregroundStyle(.red)
+                    TodayStatusCardComponent(
+                        title: "Unable to Update Goal",
+                        message: errorMessage,
+                        systemImage: "exclamationmark.triangle.fill",
+                        tint: AppTheme.error
+                    )
+                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                    .listRowBackground(Color.clear)
                 }
             }
 
@@ -60,6 +77,8 @@ internal struct GoalSetupView: View {
             }
         }
         .navigationTitle("Goal Setup")
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .task {
             guard Task.isCancelled == false else {
                 return

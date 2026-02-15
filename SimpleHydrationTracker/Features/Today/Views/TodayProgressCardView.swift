@@ -33,13 +33,15 @@ internal struct TodayProgressCardView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Today's Hydration")
                     .font(.headline)
+                    .foregroundStyle(.primary)
                 Text(progressLabel)
                     .font(.title2.weight(.semibold))
+                    .foregroundStyle(AppTheme.accent)
             }
 
             ProgressView(value: progress)
                 .progressViewStyle(.linear)
-                .tint(.blue)
+                .tint(progressTint)
 
             HStack(spacing: 12) {
                 todayMetric(title: "Consumed", value: selectedUnit.format(milliliters: consumedMilliliters))
@@ -51,7 +53,11 @@ internal struct TodayProgressCardView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(.secondarySystemBackground))
+                .fill(AppTheme.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(progressTint.opacity(0.2), lineWidth: 1)
+                )
         )
     }
 
@@ -72,13 +78,18 @@ internal struct TodayProgressCardView: View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppTheme.muted)
             Text(value)
                 .font(.subheadline.weight(.semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+                .foregroundStyle(.primary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var progressTint: Color {
+        progress >= 1 ? AppTheme.success : AppTheme.accent
     }
 }
 
@@ -92,5 +103,6 @@ internal struct TodayProgressCardView: View {
             selectedUnit: .milliliters
         )
         .padding()
+        .background(AppTheme.pageGradient)
     }
 #endif

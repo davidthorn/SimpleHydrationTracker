@@ -25,8 +25,13 @@ internal struct TodayQuickAddSectionView: View {
 
     internal var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Quick Add")
-                .font(.headline)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Quick Add")
+                    .font(.headline)
+                Text("Tap once to log common amounts.")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.muted)
+            }
 
             LazyVGrid(
                 columns: [
@@ -40,14 +45,24 @@ internal struct TodayQuickAddSectionView: View {
                     Button {
                         onQuickAddTap(amount)
                     } label: {
-                        Text(selectedUnit.format(milliliters: amount.milliliters))
-                            .font(.subheadline.weight(.semibold))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(Color.blue.opacity(0.12))
-                            )
+                        VStack(spacing: 2) {
+                            Text(selectedUnit.format(milliliters: amount.milliliters))
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(AppTheme.accent)
+                            Text("Quick log")
+                                .font(.caption2)
+                                .foregroundStyle(AppTheme.muted)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(AppTheme.accent.opacity(0.12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .stroke(AppTheme.accent.opacity(0.18), lineWidth: 1)
+                                )
+                        )
                     }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("today.quickAdd.\(amount.milliliters)")
@@ -58,7 +73,11 @@ internal struct TodayQuickAddSectionView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(.secondarySystemBackground))
+                .fill(AppTheme.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.black.opacity(0.05), lineWidth: 1)
+                )
         )
     }
 }
@@ -70,5 +89,6 @@ internal struct TodayQuickAddSectionView: View {
             selectedUnit: .milliliters
         ) { _ in }
             .padding()
+            .background(AppTheme.pageGradient)
     }
 #endif
