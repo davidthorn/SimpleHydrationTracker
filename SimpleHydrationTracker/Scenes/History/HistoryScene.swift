@@ -20,9 +20,9 @@ internal struct HistoryScene: View {
                 .navigationDestination(for: HistoryRoute.self) { route in
                     switch route {
                     case .dayDetail(let dayID):
-                        HistoryDayDetailView(dayID: dayID)
+                        HistoryDayDetailView(dayID: dayID, serviceContainer: serviceContainer)
                     case .entryDetail(let entryID):
-                        EntryDetailView(entryID: entryID)
+                        EntryDetailView(entryID: entryID, serviceContainer: serviceContainer)
                     case .historyFilter:
                         HistoryFilterView()
                     }

@@ -371,17 +371,36 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <history route view files>
-- <history scene files>
+- SimpleHydrationTracker/Scenes/History/HistoryScene.swift
+- SimpleHydrationTracker/Features/History/Routes/HistoryRoute.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryDayDetailViewModel.swift
+- SimpleHydrationTracker/Features/History/ViewModels/EntryDetailViewModel.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryFilterViewModel.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryDayDetailView.swift
+- SimpleHydrationTracker/Features/History/Views/EntryDetailView.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryFilterView.swift
+- SimpleHydrationTracker/Features/History/Routes/HistoryDayDetailView.swift (deleted)
+- SimpleHydrationTracker/Features/History/Routes/EntryDetailView.swift (deleted)
+- SimpleHydrationTracker/Features/History/Routes/HistoryFilterView.swift (deleted)
+- Models/HistoryFilterSelection.swift
+- Models/HistoryDaySummary.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryDaySummary.swift (deleted)
 
 Completed:
 - Implemented day detail, entry detail, and filter route views.
 - Added scene-owned destination registration for all history routes.
 - Added error presentation for route-level data load failures.
+- Added persisted-entry edit flow in entry detail with save/reset/delete behavior.
+- Added delete confirmation dialog with cancel path before entry deletion.
+- Kept route hashables in `Routes` and moved route destination UI types into `Views`.
+- Kept view models dependent on services (no direct store dependencies).
+- Moved shared history model/value types used by this flow into `Models`.
+- Updated History filter flow imports after model relocation (`HistoryFilterView` / `HistoryFilterViewModel`).
 
 Verification:
 - Route transitions and filters function as expected.
 - Day/entry detail failures are shown to user with clear fallback actions.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
 ---

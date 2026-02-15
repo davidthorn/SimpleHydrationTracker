@@ -1,24 +1,23 @@
 //
 //  HistoryDaySummary.swift
-//  SimpleHydrationTracker
+//  Models
 //
 //  Created by David Thorn on 15.02.2026.
 //
 
 import Foundation
-import Models
 
-internal struct HistoryDaySummary: Identifiable, Hashable {
-    internal let dayID: HydrationDayIdentifier
-    internal let date: Date
-    internal let totalMilliliters: Int
-    internal let entryCount: Int
+public struct HistoryDaySummary: Identifiable, Hashable, Sendable {
+    public let dayID: HydrationDayIdentifier
+    public let date: Date
+    public let totalMilliliters: Int
+    public let entryCount: Int
 
-    internal var id: HydrationDayIdentifier {
+    public var id: HydrationDayIdentifier {
         dayID
     }
 
-    internal init(
+    public init(
         dayID: HydrationDayIdentifier,
         date: Date,
         totalMilliliters: Int,

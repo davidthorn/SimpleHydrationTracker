@@ -7,15 +7,15 @@
 
 import Foundation
 
-internal struct TodayViewState {
-    internal let date: Date
-    internal let consumedMilliliters: Int
-    internal let goalMilliliters: Int
-    internal let remainingMilliliters: Int
-    internal let progress: Double
-    internal let errorMessage: String?
+public struct TodayViewState: Hashable, Sendable {
+    public let date: Date
+    public let consumedMilliliters: Int
+    public let goalMilliliters: Int
+    public let remainingMilliliters: Int
+    public let progress: Double
+    public let errorMessage: String?
 
-    internal init(
+    public init(
         date: Date,
         consumedMilliliters: Int,
         goalMilliliters: Int,
@@ -31,7 +31,7 @@ internal struct TodayViewState {
         self.errorMessage = errorMessage
     }
 
-    internal static func loading(date: Date) -> TodayViewState {
+    public static func loading(date: Date) -> TodayViewState {
         TodayViewState(
             date: date,
             consumedMilliliters: 0,
