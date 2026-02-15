@@ -12,6 +12,20 @@
   - `HistoryScene`
   - `SettingsScene`
 
+## Staging UX Acceptance Baseline (Mandatory)
+- Permission-dependent features must request permission when needed.
+- If permission is denied/restricted/not determined, show explicit in-app state components that explain:
+  - what is unavailable
+  - how to enable permission
+  - next action path
+- User-facing errors must be presented in UI (inline, banner, alert, or full-state component as appropriate).
+- All destructive actions must show confirmation before delete.
+- All editable persisted-model forms must implement `$swift` behavior:
+  - save appears only when changes exist
+  - reset appears only for persisted models with unsaved changes
+  - delete appears only for persisted models
+  - delete always requires confirmation and supports cancel
+
 ## Commit Policy For Every Task
 - Stop each task at a working state (buildable and reviewable).
 - Create one commit per task.
@@ -234,9 +248,11 @@ Files changed:
 Completed:
 - Added custom-styled Today UI with progress hero and quick-add actions.
 - Added Task-based button actions with cancellation guard checks.
+- Added user-visible error presentation for Today logging failures.
 
 Verification:
 - Quick-add updates progress and persists entries.
+- Logging failures are surfaced to user with actionable messaging.
 ```
 
 ### Task 4.3 - Today child routes implementation
@@ -252,9 +268,12 @@ Files changed:
 Completed:
 - Implemented all TodayScene child route views.
 - Added save/reset/delete behavior where editable persisted models are used.
+- Added delete confirmation dialogs for all Today delete flows.
 
 Verification:
 - Navigation to all Today routes works and returns correctly.
+- Form button visibility follows `$swift` save/reset/delete rules.
+- Delete flows require confirm and support cancel.
 ```
 
 ---
@@ -275,9 +294,11 @@ Files changed:
 Completed:
 - Added history projection by day from persisted entries.
 - Added list UI optimized for fast scanning.
+- Added empty and error states for history loading/render failures.
 
 Verification:
 - History shows correct day groups from stored data.
+- History error states are presented in UI and recover on retry/reopen.
 ```
 
 ### Task 5.2 - History child routes implementation
@@ -293,9 +314,11 @@ Files changed:
 Completed:
 - Implemented day detail, entry detail, and filter route views.
 - Added scene-owned destination registration for all history routes.
+- Added error presentation for route-level data load failures.
 
 Verification:
 - Route transitions and filters function as expected.
+- Day/entry detail failures are shown to user with clear fallback actions.
 ```
 
 ---
@@ -316,9 +339,11 @@ Files changed:
 Completed:
 - Added settings root view model/state.
 - Added route links for goal, reminder, permissions, units, and data management.
+- Added settings-level error presentation pattern for failed preference writes.
 
 Verification:
 - Settings routes present correctly.
+- Preference write failures are shown in UI and do not silently fail.
 ```
 
 ### Task 6.2 - Reminder service protocol and implementation
@@ -334,9 +359,11 @@ Files changed:
 Completed:
 - Added protocol-backed reminder service using Apple notification APIs.
 - Added cadence logic for gentle reminder spacing and rescheduling.
+- Added permission status mapping for notDetermined/denied/authorized/provisional states.
 
 Verification:
 - Reminder schedule requests can be created and refreshed from settings changes.
+- Permission request path works, and denied/restricted states can be surfaced to UI components.
 ```
 
 ### Task 6.3 - Settings child routes implementation
@@ -352,9 +379,13 @@ Files changed:
 Completed:
 - Implemented all SettingsScene child routes.
 - Added required save/reset/delete + confirmation behavior where persisted models are edited.
+- Added explicit permission-state components for notification settings when access is unavailable.
+- Added actionable error components/messages for settings route failures.
 
 Verification:
 - All settings routes save and reload persisted changes.
+- Permission-missing UI appears correctly and guides user to resolution path.
+- Form button visibility and delete confirmation strictly match `$swift` rules.
 ```
 
 ---
