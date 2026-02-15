@@ -656,10 +656,74 @@ Verification:
 
 ---
 
-## Stage 7 - Polish, Validation, and Handoff
+## Stage 7 - TodayScene Polishing
+Goal: deliver staging-ready Today UI/UX with clean-cut, non-default design and complete interaction clarity.
+
+### Task 7.1 - Today UI/UX and design implementation (staging-ready)
+Planned commit subject:
+`feat(today-ui): complete today scene ux and visual design for staging readiness`
+
+Post-completion commit body:
+```text
+Files changed:
+- <today view files>
+- <today component files>
+- <theme files if required>
+- plan.md
+
+Completed:
+- Applied app-level design constraints to all TodayScene surfaces and routes.
+- Ensured non-default, inspiring, intuitive visual hierarchy for progress, quick-add, and navigation actions.
+- Added/updated reusable Components for complex Today view sections to keep bodies maintainable.
+- Ensured loading, empty, and error states are explicit, actionable, and visually consistent.
+- Ensured form interactions follow $swift requirements (save/reset/delete visibility rules + delete confirmations where applicable).
+
+Verification:
+- Manual QA for Today flows and route navigation.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
+```
+
+### Task 7.2 - Today accessibility and interaction pass
+Planned commit subject:
+`feat(today): improve today accessibility labels states and interaction feedback`
+
+Post-completion commit body:
+```text
+Files changed:
+- <today view/component files>
+
+Completed:
+- Added/updated accessibility labels, values, and hints for primary Today controls.
+- Refined destructive and high-impact action confirmations/messages.
+- Improved tap target clarity and state feedback for async actions.
+
+Verification:
+- Manual accessibility check for key Today interactions.
+```
+
+### Task 7.3 - TodayScene staging validation
+Planned commit subject:
+`chore(today): validate today staging readiness and finalize task documentation`
+
+Post-completion commit body:
+```text
+Files changed:
+- plan.md
+- <today files touched during validation fixes>
+
+Completed:
+- Completed TodayScene regression pass against units, goals, and history-linked interactions.
+- Captured final staging notes for TodayScene in task documentation.
+
+Verification:
+- Manual regression pass complete for TodayScene.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
+```
+
+## Stage 8 - Polish, Validation, and Handoff
 Goal: production-readiness checks and review handoff quality.
 
-### Task 7.1 - Theme pass and UX polish
+### Task 8.1 - Theme pass and UX polish
 Planned commit subject:
 `feat(ui): apply custom clean-cut design system across all scenes`
 
@@ -677,7 +741,7 @@ Verification:
 - Manual QA on common flows across Today, History, Settings.
 ```
 
-### Task 7.2 - Build and warning gate pass
+### Task 8.2 - Build and warning gate pass
 Planned commit subject:
 `chore: complete build validation and remove compiler warnings`
 
@@ -694,7 +758,7 @@ Verification:
 - xcodebuild with iPhone 17 Pro simulator passes for iOS app target.
 ```
 
-### Task 7.3 - Sprint closeout documentation
+### Task 8.3 - Sprint closeout documentation
 Planned commit subject:
 `docs: add sprint implementation summary and pending watch integration notes`
 
