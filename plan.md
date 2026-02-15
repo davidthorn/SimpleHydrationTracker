@@ -205,16 +205,25 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <goal store files>
+- SimpleHydrationTracker/Protocols/GoalStoreProtocol.swift
+- SimpleHydrationTracker/Stores/GoalStore.swift
 - SimpleHydrationTracker/SimpleHydrationTrackerApp.swift
-- <app bootstrap files>
+- SimpleHydrationTracker/AppLaunchState.swift
+- SimpleHydrationTracker/Views/LaunchLoadingView.swift
+- SimpleHydrationTracker/Views/LaunchErrorView.swift
 
 Completed:
 - Added protocol-backed goal store with actor implementation.
 - Wired startup loading before first feature render.
+- Added JSON persistence for hydration goal in Documents directory.
+- Added AsyncStream goal publication for observers.
+- Added app launch loading/ready/failed state handling.
+- Added launch loading and launch error placeholder views.
+- Updated app-level store dependencies to protocol-typed properties.
 
 Verification:
 - Relaunch restores goal and hydration entries from Documents files.
+- iOS scheme build succeeds after app launch preload and protocol DI changes.
 ```
 
 ---
