@@ -11,12 +11,19 @@ import UserNotifications
 internal actor ReminderService: ReminderServiceProtocol {
     private let notificationCenter = UNUserNotificationCenter.current()
     private let calendar = Calendar.current
+    private let userDefaults = UserDefaults.standard
     private let identifierPrefix = "hydration.reminder"
+    private let scheduleEnabledKey = "settings.reminder.schedule.enabled"
+    private let scheduleStartHourKey = "settings.reminder.schedule.startHour"
+    private let scheduleEndHourKey = "settings.reminder.schedule.endHour"
+    private let scheduleIntervalKey = "settings.reminder.schedule.interval"
     private let maxScheduledRequests = 64
     private var authorizationContinuations: [UUID: AsyncStream<ReminderAuthorizationStatus>.Continuation]
+    private var scheduleContinuations: [UUID: AsyncStream<ReminderSchedule?>.Continuation]
 
     internal init() {
         authorizationContinuations = [:]
+        scheduleContinuations = [:]
     }
 
     internal func observeAuthorizationStatus() async -> AsyncStream<ReminderAuthorizationStatus> {
@@ -37,11 +44,47 @@ internal actor ReminderService: ReminderServiceProtocol {
         return streamPair.stream
     }
 
+    internal func observeSchedule() async -> AsyncStream<ReminderSchedule?> {
+        let streamPair = AsyncStream<ReminderSchedule?>.makeStream()
+        let id = UUID()
+        scheduleContinuations[id] = streamPair.continuation
+        streamPair.continuation.onTermination = { [weak self] _ in
+            guard let self else {
+                return
+            }
+            Task {
+                await self.removeScheduleContinuation(id: id)
+            }
+        }
+
+        let schedule = await fetchSchedule()
+        streamPair.continuation.yield(schedule)
+        return streamPair.stream
+    }
+
     internal func fetchAuthorizationStatus() async -> ReminderAuthorizationStatus {
         let settings = await notificationCenter.notificationSettings()
         let status = mapAuthorizationStatus(settings.authorizationStatus)
         publishAuthorizationStatus(status)
         return status
+    }
+
+    internal func fetchSchedule() async -> ReminderSchedule? {
+        guard userDefaults.object(forKey: scheduleEnabledKey) != nil else {
+            return nil
+        }
+
+        let isEnabled = userDefaults.bool(forKey: scheduleEnabledKey)
+        let startHour = userDefaults.integer(forKey: scheduleStartHourKey)
+        let endHour = userDefaults.integer(forKey: scheduleEndHourKey)
+        let interval = userDefaults.integer(forKey: scheduleIntervalKey)
+
+        return ReminderSchedule(
+            startHour: startHour,
+            endHour: endHour,
+            intervalMinutes: interval,
+            isEnabled: isEnabled
+        )
     }
 
     internal func requestAuthorization() async throws -> ReminderAuthorizationStatus {
@@ -54,10 +97,14 @@ internal actor ReminderService: ReminderServiceProtocol {
         try await clearSchedule()
 
         guard let schedule else {
+            clearScheduleDefaults()
+            publishSchedule(nil)
             return
         }
 
         guard schedule.isEnabled else {
+            clearScheduleDefaults()
+            publishSchedule(nil)
             return
         }
 
@@ -96,6 +143,12 @@ internal actor ReminderService: ReminderServiceProtocol {
 
             try await notificationCenter.add(request)
         }
+
+        userDefaults.set(schedule.isEnabled, forKey: scheduleEnabledKey)
+        userDefaults.set(schedule.startHour, forKey: scheduleStartHourKey)
+        userDefaults.set(schedule.endHour, forKey: scheduleEndHourKey)
+        userDefaults.set(schedule.intervalMinutes, forKey: scheduleIntervalKey)
+        publishSchedule(schedule)
     }
 
     internal func clearSchedule() async throws {
@@ -107,16 +160,35 @@ internal actor ReminderService: ReminderServiceProtocol {
             return nil
         }
         notificationCenter.removePendingNotificationRequests(withIdentifiers: reminderIdentifiers)
+        clearScheduleDefaults()
+        publishSchedule(nil)
     }
 
     private func removeContinuation(id: UUID) {
         authorizationContinuations.removeValue(forKey: id)
     }
 
+    private func removeScheduleContinuation(id: UUID) {
+        scheduleContinuations.removeValue(forKey: id)
+    }
+
     private func publishAuthorizationStatus(_ status: ReminderAuthorizationStatus) {
         for continuation in authorizationContinuations.values {
             continuation.yield(status)
         }
+    }
+
+    private func publishSchedule(_ schedule: ReminderSchedule?) {
+        for continuation in scheduleContinuations.values {
+            continuation.yield(schedule)
+        }
+    }
+
+    private func clearScheduleDefaults() {
+        userDefaults.removeObject(forKey: scheduleEnabledKey)
+        userDefaults.removeObject(forKey: scheduleStartHourKey)
+        userDefaults.removeObject(forKey: scheduleEndHourKey)
+        userDefaults.removeObject(forKey: scheduleIntervalKey)
     }
 
     private func buildScheduleMinutes(from schedule: ReminderSchedule) -> [Int] {

@@ -503,29 +503,78 @@ Verification:
 - `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
-### Task 6.3 - Settings child routes implementation
+### Task 6.3 - Settings child routes + supporting preference/reminder wiring
 Planned commit subject:
-`feat(settings): implement goal reminders permissions units and data management routes`
+`feat(settings): implement settings routes with supporting preference and reminder service wiring`
 
 Post-completion commit body:
 ```text
 Files changed:
-- <settings route view files>
-- <settings scene files>
+- SimpleHydrationTracker/ContentView.swift
+- SimpleHydrationTracker/Scenes/Settings/SettingsScene.swift
+- SimpleHydrationTracker/Features/Settings/Views/SettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Routes/GoalSettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Routes/ReminderSettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Routes/NotificationPermissionsView.swift
+- SimpleHydrationTracker/Features/Settings/Routes/UnitsSettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Routes/DataManagementView.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/GoalSettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/ReminderSettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/NotificationPermissionsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/UnitsSettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/DataManagementViewModel.swift
+- SimpleHydrationTracker/Features/Settings/Models/SettingsVolumeUnit.swift
+- SimpleHydrationTracker/Features/Settings/Models/ReminderSchedule.swift
+- SimpleHydrationTracker/Protocols/ReminderServiceProtocol.swift
+- SimpleHydrationTracker/Protocols/ServiceContainerProtocol.swift
+- SimpleHydrationTracker/Protocols/UnitsPreferenceServiceProtocol.swift
+- SimpleHydrationTracker/Services/ReminderService.swift
+- SimpleHydrationTracker/Services/UnitsPreferenceService.swift
+- SimpleHydrationTracker/Services/ServiceContainer.swift
+- SimpleHydrationTracker/Services/PreviewServiceContainer.swift
 
 Completed:
 - Implemented all SettingsScene child routes.
 - Added required save/reset/delete + confirmation behavior where persisted models are edited.
 - Added explicit permission-state components for notification settings when access is unavailable.
 - Added actionable error components/messages for settings route failures.
+- Wired SettingsScene and SettingsView to service-container dependency injection for route-level view model creation.
+- Added units preference service and protocol-backed persistence flow for units route save/reset/delete behavior.
+- Extended reminder service protocol and implementation to support schedule fetch/observe needed for route form handling.
 
 Verification:
 - All settings routes save and reload persisted changes.
 - Permission-missing UI appears correctly and guides user to resolution path.
 - Form button visibility and delete confirmation strictly match `$swift` rules.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
-### Task 6.4 - Settings UI/UX and design implementation (staging-ready)
+### Task 6.4 - App-wide preferences observation and application
+Planned commit subject:
+`feat(preferences): apply settings preferences across app features with live observation`
+
+Post-completion commit body:
+```text
+Files changed:
+- <settings preference service files>
+- <today/history viewmodel files>
+- <today/history view files>
+- plan.md
+
+Completed:
+- Implemented app-wide preference consumption so settings are not isolated to Settings routes.
+- Wired Today and History feature view models to observe and apply preference streams.
+- Ensured preference updates propagate live without requiring app relaunch.
+- Added fallback/default behavior when preference data is unavailable or invalid.
+- Added error-state handling where preference-driven rendering can fail.
+
+Verification:
+- Manual QA pass confirms Today/History react immediately to preference changes.
+- Preference changes persist, reload on launch, and apply across relevant feature screens.
+- `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
+```
+
+### Task 6.5 - Settings UI/UX and design implementation (staging-ready)
 Planned commit subject:
 `feat(settings-ui): complete settings ux and visual design for staging readiness`
 

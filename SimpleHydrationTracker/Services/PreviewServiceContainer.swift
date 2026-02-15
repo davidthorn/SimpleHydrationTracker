@@ -13,11 +13,13 @@
         internal let hydrationService: HydrationServiceProtocol
         internal let goalService: GoalServiceProtocol
         internal let reminderService: ReminderServiceProtocol
+        internal let unitsPreferenceService: UnitsPreferenceServiceProtocol
 
         internal init() {
             hydrationService = PreviewHydrationService()
             goalService = PreviewGoalService()
             reminderService = PreviewReminderService()
+            unitsPreferenceService = PreviewUnitsPreferenceService()
         }
     }
 
@@ -60,8 +62,20 @@
             return streamPair.stream
         }
 
+        internal func observeSchedule() async -> AsyncStream<ReminderSchedule?> {
+            let streamPair = AsyncStream<ReminderSchedule?>.makeStream()
+            streamPair.continuation.yield(
+                ReminderSchedule(startHour: 9, endHour: 20, intervalMinutes: 120, isEnabled: true)
+            )
+            return streamPair.stream
+        }
+
         internal func fetchAuthorizationStatus() async -> ReminderAuthorizationStatus {
             .authorized
+        }
+
+        internal func fetchSchedule() async -> ReminderSchedule? {
+            ReminderSchedule(startHour: 9, endHour: 20, intervalMinutes: 120, isEnabled: true)
         }
 
         internal func requestAuthorization() async throws -> ReminderAuthorizationStatus {
@@ -71,5 +85,21 @@
         internal func updateSchedule(_ schedule: ReminderSchedule?) async throws {}
 
         internal func clearSchedule() async throws {}
+    }
+
+    internal actor PreviewUnitsPreferenceService: UnitsPreferenceServiceProtocol {
+        internal func observeUnit() async -> AsyncStream<SettingsVolumeUnit> {
+            let streamPair = AsyncStream<SettingsVolumeUnit>.makeStream()
+            streamPair.continuation.yield(.milliliters)
+            return streamPair.stream
+        }
+
+        internal func fetchUnit() async -> SettingsVolumeUnit {
+            .milliliters
+        }
+
+        internal func updateUnit(_ unit: SettingsVolumeUnit) async {}
+
+        internal func resetUnit() async {}
     }
 #endif

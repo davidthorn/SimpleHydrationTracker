@@ -13,7 +13,7 @@ internal struct ReminderSchedule: Hashable, Sendable {
     internal let intervalMinutes: Int
     internal let isEnabled: Bool
 
-    internal init(
+    nonisolated internal init(
         startHour: Int,
         endHour: Int,
         intervalMinutes: Int,

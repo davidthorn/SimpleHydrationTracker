@@ -8,21 +8,27 @@
 import SwiftUI
 
 internal struct SettingsScene: View {
+    private let serviceContainer: ServiceContainerProtocol
+
+    internal init(serviceContainer: ServiceContainerProtocol) {
+        self.serviceContainer = serviceContainer
+    }
+
     internal var body: some View {
         NavigationStack {
-            SettingsView()
+            SettingsView(serviceContainer: serviceContainer)
                 .navigationDestination(for: SettingsRoute.self) { route in
                     switch route {
                     case .goalSettings:
-                        GoalSettingsView()
+                        GoalSettingsView(serviceContainer: serviceContainer)
                     case .reminderSettings:
-                        ReminderSettingsView()
+                        ReminderSettingsView(serviceContainer: serviceContainer)
                     case .notificationPermissions:
-                        NotificationPermissionsView()
+                        NotificationPermissionsView(serviceContainer: serviceContainer)
                     case .unitsSettings:
-                        UnitsSettingsView()
+                        UnitsSettingsView(serviceContainer: serviceContainer)
                     case .dataManagement:
-                        DataManagementView()
+                        DataManagementView(serviceContainer: serviceContainer)
                     }
                 }
         }
@@ -31,6 +37,6 @@ internal struct SettingsScene: View {
 
 #if DEBUG
     #Preview {
-        SettingsScene()
+        SettingsScene(serviceContainer: PreviewServiceContainer())
     }
 #endif

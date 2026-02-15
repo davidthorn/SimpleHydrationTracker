@@ -10,7 +10,8 @@ import SwiftUI
 internal struct SettingsView: View {
     @StateObject private var viewModel: SettingsViewModel
 
-    internal init() {
+    internal init(serviceContainer: ServiceContainerProtocol) {
+        let _ = serviceContainer
         let vm = SettingsViewModel()
         _viewModel = StateObject(wrappedValue: vm)
     }
@@ -94,6 +95,6 @@ internal struct SettingsView: View {
 
 #if DEBUG
     #Preview {
-        SettingsView()
+        SettingsView(serviceContainer: PreviewServiceContainer())
     }
 #endif
