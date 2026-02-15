@@ -18,20 +18,47 @@ internal struct NotificationPermissionsView: View {
 
     internal var body: some View {
         Form {
+            Section {
+                SettingsHeroCardComponent(
+                    title: "Notification Permissions",
+                    message: "Control how hydration reminders are allowed to notify you.",
+                    systemImage: "lock.shield",
+                    tint: AppTheme.warning
+                )
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+            }
+
             Section("Status") {
                 switch viewModel.status {
                 case .authorized:
-                    Text("Notifications are authorized.")
-                        .foregroundStyle(.secondary)
+                    SettingsStatusCardComponent(
+                        title: "Authorized",
+                        message: "Notifications are enabled for this app.",
+                        systemImage: "checkmark.seal.fill",
+                        tint: AppTheme.success
+                    )
                 case .provisional:
-                    Text("Notifications are provisionally authorized.")
-                        .foregroundStyle(.secondary)
+                    SettingsStatusCardComponent(
+                        title: "Provisional Access",
+                        message: "Notifications can be delivered quietly.",
+                        systemImage: "bell.badge",
+                        tint: AppTheme.warning
+                    )
                 case .notDetermined:
-                    Text("Notification permission has not been requested.")
-                        .foregroundStyle(.secondary)
+                    SettingsStatusCardComponent(
+                        title: "Not Requested",
+                        message: "Request permission to enable reminders.",
+                        systemImage: "questionmark.circle",
+                        tint: AppTheme.warning
+                    )
                 case .denied:
-                    Text("Notifications are denied for this app.")
-                        .foregroundStyle(AppTheme.error)
+                    SettingsStatusCardComponent(
+                        title: "Denied",
+                        message: "Open iOS Settings to enable notifications.",
+                        systemImage: "xmark.octagon.fill",
+                        tint: AppTheme.error
+                    )
                 }
             }
 
@@ -58,9 +85,13 @@ internal struct NotificationPermissionsView: View {
             }
 
             if let errorMessage = viewModel.errorMessage {
-                Section("Error") {
-                    Text(errorMessage)
-                        .foregroundStyle(AppTheme.error)
+                Section {
+                    SettingsStatusCardComponent(
+                        title: "Permission Error",
+                        message: errorMessage,
+                        systemImage: "exclamationmark.triangle.fill",
+                        tint: AppTheme.error
+                    )
                     Button("Dismiss", role: .cancel) {
                         viewModel.clearError()
                     }
@@ -68,6 +99,8 @@ internal struct NotificationPermissionsView: View {
             }
         }
         .navigationTitle("Permissions")
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .task {
             guard Task.isCancelled == false else {
                 return

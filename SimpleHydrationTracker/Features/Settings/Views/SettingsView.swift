@@ -16,45 +16,89 @@ internal struct SettingsView: View {
     }
 
     internal var body: some View {
-        List {
-            Section("Hydration") {
-                NavigationLink(value: SettingsRoute.goalSettings) {
-                    LabeledContent("Goal", value: "Daily Target")
-                }
-            }
+        ZStack {
+            AppTheme.pageGradient
+                .ignoresSafeArea()
 
-            Section("Notifications") {
-                NavigationLink(value: SettingsRoute.reminderSettings) {
-                    LabeledContent("Reminders", value: "Schedule")
-                }
-                NavigationLink(value: SettingsRoute.notificationPermissions) {
-                    LabeledContent("Permissions", value: "Access")
-                }
-            }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    SettingsHeroCardComponent(
+                        title: "Personalize Hydration",
+                        message: "Set daily goals, reminders, units, and data controls in one place.",
+                        systemImage: "slider.horizontal.3",
+                        tint: AppTheme.accent
+                    )
 
-            Section("Preferences") {
-                NavigationLink(value: SettingsRoute.unitsSettings) {
-                    LabeledContent("Units", value: viewModel.selectedUnit.settingsValueLabel)
-                }
-            }
+                    SettingsRouteSectionComponent(
+                        title: "Hydration",
+                        rows: [
+                            SettingsRow(
+                                route: .goalSettings,
+                                title: "Goal",
+                                subtitle: "Daily target",
+                                systemImage: "target",
+                                tint: AppTheme.success
+                            )
+                        ]
+                    )
 
-            Section("Data") {
-                NavigationLink(value: SettingsRoute.dataManagement) {
-                    LabeledContent("Data Management", value: "Export & Delete")
-                }
-            }
+                    SettingsRouteSectionComponent(
+                        title: "Notifications",
+                        rows: [
+                            SettingsRow(
+                                route: .reminderSettings,
+                                title: "Reminders",
+                                subtitle: "Schedule cadence",
+                                systemImage: "bell.badge",
+                                tint: AppTheme.accent
+                            ),
+                            SettingsRow(
+                                route: .notificationPermissions,
+                                title: "Permissions",
+                                subtitle: "Access status",
+                                systemImage: "lock.shield",
+                                tint: AppTheme.warning
+                            )
+                        ]
+                    )
 
-            if let errorMessage = viewModel.errorMessage {
-                Section("Error") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(errorMessage)
-                            .foregroundStyle(AppTheme.error)
-                            .font(.footnote)
-                        Button("Dismiss", role: .cancel) {
-                            viewModel.clearError()
-                        }
+                    SettingsRouteSectionComponent(
+                        title: "Preferences",
+                        rows: [
+                            SettingsRow(
+                                route: .unitsSettings,
+                                title: "Units",
+                                subtitle: viewModel.selectedUnit.settingsValueLabel,
+                                systemImage: "ruler",
+                                tint: AppTheme.accent
+                            )
+                        ]
+                    )
+
+                    SettingsRouteSectionComponent(
+                        title: "Data",
+                        rows: [
+                            SettingsRow(
+                                route: .dataManagement,
+                                title: "Data Management",
+                                subtitle: "Export and clear",
+                                systemImage: "tray.full",
+                                tint: AppTheme.error
+                            )
+                        ]
+                    )
+
+                    if let errorMessage = viewModel.errorMessage {
+                        SettingsStatusCardComponent(
+                            title: "Settings Error",
+                            message: errorMessage,
+                            systemImage: "exclamationmark.triangle.fill",
+                            tint: AppTheme.error
+                        )
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
         }
         .overlay {

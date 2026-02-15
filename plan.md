@@ -624,20 +624,29 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <settings view files>
-- <settings component files>
-- <theme files>
+- SimpleHydrationTracker/Theme/AppTheme.swift
+- SimpleHydrationTracker/Features/Settings/Views/SettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Models/SettingsRow.swift
+- SimpleHydrationTracker/Features/Settings/Views/GoalSettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Views/ReminderSettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Views/NotificationPermissionsView.swift
+- SimpleHydrationTracker/Features/Settings/Views/UnitsSettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Views/DataManagementView.swift
+- SimpleHydrationTracker/Features/Settings/Components/SettingsHeroCardComponent.swift
+- SimpleHydrationTracker/Features/Settings/Components/SettingsRouteSectionComponent.swift
+- SimpleHydrationTracker/Features/Settings/Components/SettingsRouteRowComponent.swift
+- SimpleHydrationTracker/Features/Settings/Components/SettingsStatusCardComponent.swift
 - plan.md
 
 Completed:
-- Applied Settings feature UI/UX and visual design rules to all Stage 6 screens.
-- Ensured non-default, clean-cut, intuitive visual hierarchy across Settings root and child routes.
-- Added/updated reusable Components for complex body sections to keep views maintainable.
-- Ensured permission-dependent views present explicit unavailable/denied states with next actions.
-- Ensured editable forms in Settings routes follow `$swift` save/reset/delete + delete confirmation behavior.
-- Ensured loading, empty, and error states are explicit, actionable, and visually consistent.
-- Ensured all async UI actions are Task-driven in Views with cancellation guards where side effects can occur.
-- Completed rule-by-rule `$swift` compliance check for Stage 6 deliverables.
+- Added app-level theme tokens (`success`, `warning`) used by Settings status and result states.
+- Reworked Settings root into a non-default, clean-cut layout with grouped sections, hero header, and route row components.
+- Introduced reusable Settings components for hero, route-row, and status-card patterns to standardize visual language.
+- Upgraded all Settings child routes to use consistent hero sections and explicit status/error messaging cards.
+- Applied gradient-backed backgrounds and hidden scroll/form backgrounds for cohesive app-level styling.
+- Preserved route-level behavior while improving permission-denied, not-determined, and error feedback clarity.
+- Kept form/task behavior aligned with existing Stage 6 logic while raising staging UI/UX quality.
+- Completed compiler verification for the full app scheme after Settings design updates.
 
 Verification:
 - Manual QA pass for Settings flows: goal, reminders, permissions, units, data management.

@@ -23,6 +23,17 @@ internal struct DataManagementView: View {
 
     internal var body: some View {
         Form {
+            Section {
+                SettingsHeroCardComponent(
+                    title: "Data Management",
+                    message: "Export records for review or delete all hydration data when needed.",
+                    systemImage: "tray.full",
+                    tint: AppTheme.error
+                )
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+            }
+
             Section("Export") {
                 Button("Prepare Export") {
                     Task {
@@ -36,8 +47,13 @@ internal struct DataManagementView: View {
             }
 
             if let exportMessage = viewModel.exportResultMessage {
-                Section("Export Result") {
-                    Text(exportMessage)
+                Section {
+                    SettingsStatusCardComponent(
+                        title: "Export Ready",
+                        message: exportMessage,
+                        systemImage: "square.and.arrow.up",
+                        tint: AppTheme.success
+                    )
                 }
             }
 
@@ -49,9 +65,13 @@ internal struct DataManagementView: View {
             }
 
             if let errorMessage = viewModel.errorMessage {
-                Section("Error") {
-                    Text(errorMessage)
-                        .foregroundStyle(AppTheme.error)
+                Section {
+                    SettingsStatusCardComponent(
+                        title: "Data Error",
+                        message: errorMessage,
+                        systemImage: "exclamationmark.triangle.fill",
+                        tint: AppTheme.error
+                    )
                     Button("Dismiss", role: .cancel) {
                         viewModel.clearMessages()
                     }
@@ -59,6 +79,8 @@ internal struct DataManagementView: View {
             }
         }
         .navigationTitle("Data")
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .alert("Are you sure you want to delete this?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Delete", role: .destructive) {

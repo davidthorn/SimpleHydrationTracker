@@ -24,6 +24,17 @@ internal struct UnitsSettingsView: View {
 
     internal var body: some View {
         Form {
+            Section {
+                SettingsHeroCardComponent(
+                    title: "Display Units",
+                    message: "Choose how hydration values appear across the app.",
+                    systemImage: "ruler",
+                    tint: AppTheme.accent
+                )
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+            }
+
             Section("Unit") {
                 Picker("Volume Unit", selection: $viewModel.selectedUnit) {
                     ForEach(SettingsVolumeUnit.allCases) { unit in
@@ -34,9 +45,13 @@ internal struct UnitsSettingsView: View {
             }
 
             if let errorMessage = viewModel.errorMessage {
-                Section("Error") {
-                    Text(errorMessage)
-                        .foregroundStyle(AppTheme.error)
+                Section {
+                    SettingsStatusCardComponent(
+                        title: "Units Error",
+                        message: errorMessage,
+                        systemImage: "exclamationmark.triangle.fill",
+                        tint: AppTheme.error
+                    )
                 }
             }
 
@@ -59,6 +74,8 @@ internal struct UnitsSettingsView: View {
             }
         }
         .navigationTitle("Units")
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.canSave {

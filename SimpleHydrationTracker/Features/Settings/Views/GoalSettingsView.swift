@@ -27,6 +27,17 @@ internal struct GoalSettingsView: View {
 
     internal var body: some View {
         Form {
+            Section {
+                SettingsHeroCardComponent(
+                    title: "Daily Goal",
+                    message: "Set the target used to calculate progress throughout the app.",
+                    systemImage: "target",
+                    tint: AppTheme.success
+                )
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+            }
+
             Section("Daily Goal") {
                 TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.goalText)
                     .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
@@ -37,9 +48,15 @@ internal struct GoalSettingsView: View {
             }
 
             if let errorMessage = viewModel.errorMessage {
-                Section("Error") {
-                    Text(errorMessage)
-                        .foregroundStyle(AppTheme.error)
+                Section {
+                    SettingsStatusCardComponent(
+                        title: "Unable to Save Goal",
+                        message: errorMessage,
+                        systemImage: "exclamationmark.triangle.fill",
+                        tint: AppTheme.error
+                    )
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
                 }
             }
 
@@ -62,6 +79,8 @@ internal struct GoalSettingsView: View {
             }
         }
         .navigationTitle("Goal")
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.canSave {

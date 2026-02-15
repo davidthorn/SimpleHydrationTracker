@@ -25,17 +25,40 @@ internal struct ReminderSettingsView: View {
 
     internal var body: some View {
         Form {
+            Section {
+                SettingsHeroCardComponent(
+                    title: "Reminder Schedule",
+                    message: "Choose reminder windows and cadence for hydration nudges.",
+                    systemImage: "bell.badge",
+                    tint: AppTheme.accent
+                )
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+            }
+
             Section("Permission") {
                 switch viewModel.authorizationStatus {
                 case .authorized, .provisional:
-                    Text("Notifications enabled.")
-                        .foregroundStyle(.secondary)
+                    SettingsStatusCardComponent(
+                        title: "Notifications Enabled",
+                        message: "Reminder alerts can be delivered on this device.",
+                        systemImage: "checkmark.seal.fill",
+                        tint: AppTheme.success
+                    )
                 case .notDetermined:
-                    Text("Notification permission has not been requested yet.")
-                        .foregroundStyle(.secondary)
+                    SettingsStatusCardComponent(
+                        title: "Permission Required",
+                        message: "Request notification permission from the Permissions route.",
+                        systemImage: "bell.badge",
+                        tint: AppTheme.warning
+                    )
                 case .denied:
-                    Text("Notification access denied. Enable access in Permissions.")
-                        .foregroundStyle(AppTheme.error)
+                    SettingsStatusCardComponent(
+                        title: "Permission Denied",
+                        message: "Enable notification access in Permissions to use reminders.",
+                        systemImage: "bell.slash.fill",
+                        tint: AppTheme.error
+                    )
                 }
             }
 
@@ -70,9 +93,13 @@ internal struct ReminderSettingsView: View {
             }
 
             if let errorMessage = viewModel.errorMessage {
-                Section("Error") {
-                    Text(errorMessage)
-                        .foregroundStyle(AppTheme.error)
+                Section {
+                    SettingsStatusCardComponent(
+                        title: "Reminder Error",
+                        message: errorMessage,
+                        systemImage: "exclamationmark.triangle.fill",
+                        tint: AppTheme.error
+                    )
                 }
             }
 
@@ -95,6 +122,8 @@ internal struct ReminderSettingsView: View {
             }
         }
         .navigationTitle("Reminders")
+        .scrollContentBackground(.hidden)
+        .background(AppTheme.pageGradient)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.canSave {
