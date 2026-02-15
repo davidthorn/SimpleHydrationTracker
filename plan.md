@@ -180,16 +180,22 @@ Planned commit subject:
 Post-completion commit body:
 ```text
 Files changed:
-- <store protocol file>
-- <store actor file>
+- SimpleHydrationTracker/Protocols/HydrationStoreProtocol.swift
+- SimpleHydrationTracker/Protocols/StoreFilePathResolving.swift
+- SimpleHydrationTracker/Stores/HydrationStore.swift
+- SimpleHydrationTracker/Stores/StoreFilePathResolver.swift
 
 Completed:
 - Added protocol-backed hydration store.
 - Implemented read/write to Documents JSON.
 - Added AsyncStream publication for updates.
+- Moved protocol contracts to dedicated `Protocols` folder.
+- Injected path resolution via protocol instead of concrete resolver type.
+- Applied Swift 6 isolation-safe async path-resolution calls inside actor methods.
 
 Verification:
 - Add/update/delete flows persist and reload correctly.
+- iOS scheme build succeeds after protocol-folder and DI refactor.
 ```
 
 ### Task 3.3 - Implement goal store protocol + actor and app launch load

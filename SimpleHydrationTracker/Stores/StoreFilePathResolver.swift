@@ -7,15 +7,11 @@
 
 import Foundation
 
-internal struct StoreFilePathResolver {
-    private let fileManager: FileManager
-
-    internal init(fileManager: FileManager = .default) {
-        self.fileManager = fileManager
-    }
+internal struct StoreFilePathResolver: StoreFilePathResolving {
+    internal init() {}
 
     internal func documentsDirectoryURL() throws -> URL {
-        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        guard let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             throw StoreInfrastructureError.documentsDirectoryUnavailable
         }
 
