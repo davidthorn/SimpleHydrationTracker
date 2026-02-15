@@ -707,9 +707,9 @@ Verification:
 - `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
-### Task 7.2 - Today accessibility and interaction pass
+### Task 7.2 - Today accessibility and interaction pass + History day overview enrichment
 Planned commit subject:
-`feat(today): improve today accessibility labels states and interaction feedback`
+`feat(today-history): improve accessibility feedback and enrich history day overviews`
 
 Post-completion commit body:
 ```text
@@ -723,6 +723,27 @@ Files changed:
 - SimpleHydrationTracker/Features/Today/Components/TodayRouteRowComponent.swift
 - SimpleHydrationTracker/Features/Today/Components/TodayDayEntryRowComponent.swift
 - SimpleHydrationTracker/Features/Today/Components/TodayToastComponent.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/TodayViewModel.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayView.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryViewModel.swift
+- SimpleHydrationTracker/Features/History/Components/HistoryDayRowComponent.swift
+- SimpleHydrationTracker/Features/History/Components/HistoryDayMiniChartComponent.swift
+- SimpleHydrationTracker/Features/Settings/Routes/SettingsRoute.swift
+- SimpleHydrationTracker/Features/Settings/Views/SettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Views/SipSizeSettingsView.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/SettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/SipSizeSettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/Models/SipSizeOption+Display.swift
+- SimpleHydrationTracker/Protocols/SipSizePreferenceServiceProtocol.swift
+- SimpleHydrationTracker/Protocols/ServiceContainerProtocol.swift
+- SimpleHydrationTracker/Scenes/Settings/SettingsScene.swift
+- SimpleHydrationTracker/Services/SipSizePreferenceService.swift
+- SimpleHydrationTracker/Services/ServiceContainer.swift
+- SimpleHydrationTracker/Services/PreviewServiceContainer.swift
+- Models/HistoryDaySummary.swift
+- Models/HistoryDayIntakeBucket.swift
+- Models/QuickAddAmount.swift
+- Models/SipSizeOption.swift
 - plan.md
 
 Completed:
@@ -730,28 +751,68 @@ Completed:
 - Added accessibility identifiers for Today route links to improve UI-test targeting and disabled-state validation.
 - Improved confirmation semantics for destructive Today actions with clearer delete titles/messages and explicit button hints.
 - Kept quick-add success feedback accessible through the toast component while maintaining iOS 17.6-compatible modifiers.
+- Enriched History day rows with a compact intake chart and inline summary stats before day-detail navigation.
+- Added day analytics projection in history state (average per hour, average per entry, peak intake bucket, and chart bucket series).
+- Extended shared `HistoryDaySummary` model to carry chart + analytics metadata for richer cross-surface day summaries.
+- Added shared `SipSizeOption` and protocol-backed sip-size preference service with AsyncStream observation.
+- Added Settings route + screen to configure sip size with save/reset/delete behavior and preference preview.
+- Updated Today quick-add generation to use realistic sip-based increments (small intervals) while preserving larger one-tap amounts.
+- Converted `QuickAddAmount` to a dynamic value model so quick-add options can adapt to user preference.
 
 Verification:
 - Manual VoiceOver-oriented pass for key Today interactions (quick add, route links, day entry rows, progress summary, chart).
 - `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 
-### Task 7.3 - TodayScene staging validation
+### Task 7.3 - TodayScene and Day Detail consolidation + realistic quick-add refinements
 Planned commit subject:
-`chore(today): validate today staging readiness and finalize task documentation`
+`feat(today-history-settings): consolidate day detail and finalize realistic quick-add workflow`
 
 Post-completion commit body:
 ```text
 Files changed:
+- Models/HistoryDaySummary.swift
+- Models/HistoryDayIntakeBucket.swift
+- Models/QuickAddAmount.swift
+- Models/SipSizeOption.swift
+- SimpleHydrationTracker/Features/History/Components/HistoryDayRowComponent.swift
+- SimpleHydrationTracker/Features/History/Components/HistoryDayMiniChartComponent.swift
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryViewModel.swift
+- SimpleHydrationTracker/Features/History/Views/HistoryDayDetailView.swift (deleted)
+- SimpleHydrationTracker/Features/History/ViewModels/HistoryDayDetailViewModel.swift (deleted)
+- SimpleHydrationTracker/Features/Settings/Routes/SettingsRoute.swift
+- SimpleHydrationTracker/Features/Settings/Models/SipSizeOption+Display.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/SettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/ViewModels/SipSizeSettingsViewModel.swift
+- SimpleHydrationTracker/Features/Settings/Views/SettingsView.swift
+- SimpleHydrationTracker/Features/Settings/Views/SipSizeSettingsView.swift
+- SimpleHydrationTracker/Features/Today/Components/TodayDayEntryRowComponent.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/TodayViewModel.swift
+- SimpleHydrationTracker/Features/Today/ViewModels/AddCustomAmountViewModel.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayView.swift
+- SimpleHydrationTracker/Features/Today/Views/TodayQuickAddSectionView.swift
+- SimpleHydrationTracker/Features/Today/Views/AddCustomAmountView.swift
+- SimpleHydrationTracker/Protocols/ServiceContainerProtocol.swift
+- SimpleHydrationTracker/Protocols/SipSizePreferenceServiceProtocol.swift
+- SimpleHydrationTracker/Scenes/History/HistoryScene.swift
+- SimpleHydrationTracker/Scenes/Settings/SettingsScene.swift
+- SimpleHydrationTracker/Services/ServiceContainer.swift
+- SimpleHydrationTracker/Services/SipSizePreferenceService.swift
+- SimpleHydrationTracker/Services/PreviewServiceContainer.swift
 - plan.md
-- <today files touched during validation fixes>
 
 Completed:
-- Completed TodayScene regression pass against units, goals, and history-linked interactions.
-- Captured final staging notes for TodayScene in task documentation.
+- Implemented configurable sip-size preference in Settings and persisted it through a protocol-backed AsyncStream service.
+- Updated Today quick-add behavior to generate realistic small sip intervals while keeping larger one-tap amounts.
+- Added size descriptors and SF Symbol size icons to Today quick-add controls for better contextual guidance.
+- Embedded quick-add controls in Add Amount form to prefill the amount text while preserving manual editing.
+- Enhanced Day Detail entry rows with size-based icons and intake descriptors for each entry.
+- Enriched History day rows with mini intake chart + summary stats before opening day detail.
+- Consolidated duplicate day-detail flows by removing History-specific day detail/view model and routing History to shared Day Detail.
+- Added Today route destination support in HistoryScene so shared Day Detail navigation remains consistent across scenes.
 
 Verification:
-- Manual regression pass complete for TodayScene.
+- Manual regression pass complete for Today/History/Settings interactions related to quick add, add amount, and day detail navigation.
 - `xcodebuild -project SimpleHydrationTracker.xcodeproj -scheme SimpleHydrationTracker -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` succeeds.
 ```
 

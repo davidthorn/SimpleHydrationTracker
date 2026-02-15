@@ -27,6 +27,8 @@ internal struct SettingsScene: View {
                         NotificationPermissionsView(serviceContainer: serviceContainer)
                     case .unitsSettings:
                         UnitsSettingsView(serviceContainer: serviceContainer)
+                    case .sipSizeSettings:
+                        SipSizeSettingsView(serviceContainer: serviceContainer)
                     case .dataManagement:
                         DataManagementView(serviceContainer: serviceContainer)
                     }

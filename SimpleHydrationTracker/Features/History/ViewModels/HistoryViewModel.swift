@@ -167,8 +167,23 @@ internal final class HistoryViewModel: ObservableObject {
         }
 
         let summaries = groupedByDay.map { date, dayEntries in
+            let sortedEntries = dayEntries.sorted { lhs, rhs in
+                lhs.consumedAt < rhs.consumedAt
+            }
+            let firstEntryAt = sortedEntries.first?.consumedAt
+            let lastEntryAt = sortedEntries.last?.consumedAt
             let totalMilliliters = dayEntries.reduce(0) { partialResult, entry in
                 partialResult + entry.amountMilliliters
+            }
+            let averageMillilitersPerEntry = dayEntries.isEmpty ? nil : totalMilliliters / dayEntries.count
+            let averageMillilitersPerHour = computeAverageMillilitersPerHour(
+                totalMilliliters: totalMilliliters,
+                firstEntryAt: firstEntryAt,
+                lastEntryAt: lastEntryAt
+            )
+            let intakeBuckets = makeIntakeBuckets(from: sortedEntries)
+            let peakBucket = intakeBuckets.max { lhs, rhs in
+                lhs.amountMilliliters < rhs.amountMilliliters
             }
 
             return HistoryDaySummary(
@@ -176,7 +191,14 @@ internal final class HistoryViewModel: ObservableObject {
                 date: date,
                 totalMilliliters: totalMilliliters,
                 entryCount: dayEntries.count,
-                goalMilliliters: currentGoalMilliliters
+                goalMilliliters: currentGoalMilliliters,
+                firstEntryAt: firstEntryAt,
+                lastEntryAt: lastEntryAt,
+                averageMillilitersPerHour: averageMillilitersPerHour,
+                averageMillilitersPerEntry: averageMillilitersPerEntry,
+                peakBucketStart: peakBucket?.start,
+                peakBucketMilliliters: peakBucket?.amountMilliliters,
+                intakeBuckets: intakeBuckets
             )
         }
 
@@ -206,5 +228,66 @@ internal final class HistoryViewModel: ObservableObject {
             return true
         }
         return date >= startDate
+    }
+
+    private func computeAverageMillilitersPerHour(
+        totalMilliliters: Int,
+        firstEntryAt: Date?,
+        lastEntryAt: Date?
+    ) -> Int? {
+        guard let firstEntryAt, let lastEntryAt else {
+            return nil
+        }
+
+        let durationSeconds = max(lastEntryAt.timeIntervalSince(firstEntryAt), 0)
+        let durationHours = max(Int(ceil(durationSeconds / 3600)), 1)
+        return totalMilliliters / durationHours
+    }
+
+    private func makeIntakeBuckets(from entries: [HydrationEntry]) -> [HistoryDayIntakeBucket] {
+        guard let firstEntry = entries.first else {
+            return []
+        }
+
+        let intervalMinutes = bucketIntervalMinutes(from: entries)
+        let intervalSeconds = TimeInterval(intervalMinutes * 60)
+        var totalsByBucket: [Int: Int] = [:]
+
+        for entry in entries {
+            let secondsFromStart = max(entry.consumedAt.timeIntervalSince(firstEntry.consumedAt), 0)
+            let bucketIndex = Int(secondsFromStart / intervalSeconds)
+            totalsByBucket[bucketIndex, default: 0] += entry.amountMilliliters
+        }
+
+        guard let maxBucketIndex = totalsByBucket.keys.max() else {
+            return []
+        }
+
+        return (0...maxBucketIndex).map { bucketIndex in
+            let bucketStart = firstEntry.consumedAt.addingTimeInterval(TimeInterval(bucketIndex) * intervalSeconds)
+            return HistoryDayIntakeBucket(
+                id: bucketIndex,
+                start: bucketStart,
+                amountMilliliters: totalsByBucket[bucketIndex, default: 0]
+            )
+        }
+    }
+
+    private func bucketIntervalMinutes(from entries: [HydrationEntry]) -> Int {
+        guard let first = entries.first, let last = entries.last else {
+            return 60
+        }
+
+        let spanMinutes = max(Int(last.consumedAt.timeIntervalSince(first.consumedAt) / 60), 1)
+        switch spanMinutes {
+        case ..<120:
+            return 15
+        case ..<360:
+            return 30
+        case ..<720:
+            return 60
+        default:
+            return 120
+        }
     }
 }

@@ -12,6 +12,7 @@ internal struct ServiceContainer: ServiceContainerProtocol {
     internal let goalService: GoalServiceProtocol
     internal let reminderService: ReminderServiceProtocol
     internal let unitsPreferenceService: UnitsPreferenceServiceProtocol
+    internal let sipSizePreferenceService: SipSizePreferenceServiceProtocol
     internal let historyFilterPreferenceService: HistoryFilterPreferenceServiceProtocol
 
     internal init(
@@ -22,6 +23,7 @@ internal struct ServiceContainer: ServiceContainerProtocol {
         goalService = GoalService(goalStore: goalStore)
         reminderService = ReminderService()
         unitsPreferenceService = UnitsPreferenceService()
+        sipSizePreferenceService = SipSizePreferenceService()
         historyFilterPreferenceService = HistoryFilterPreferenceService()
     }
 }

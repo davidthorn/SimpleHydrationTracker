@@ -15,7 +15,8 @@ internal struct AddCustomAmountView: View {
     internal init(serviceContainer: ServiceContainerProtocol) {
         let vm = AddCustomAmountViewModel(
             hydrationService: serviceContainer.hydrationService,
-            unitsPreferenceService: serviceContainer.unitsPreferenceService
+            unitsPreferenceService: serviceContainer.unitsPreferenceService,
+            sipSizePreferenceService: serviceContainer.sipSizePreferenceService
         )
         _viewModel = StateObject(wrappedValue: vm)
         _isSaving = State(initialValue: false)
@@ -40,6 +41,17 @@ internal struct AddCustomAmountView: View {
                 Text("Unit: \(viewModel.selectedUnit.shortLabel)")
                     .font(.caption)
                     .foregroundStyle(AppTheme.muted)
+            }
+
+            Section {
+                TodayQuickAddSectionView(
+                    quickAddOptions: viewModel.quickAddOptions,
+                    selectedUnit: viewModel.selectedUnit
+                ) { amount in
+                    viewModel.prefillAmount(using: amount)
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                .listRowBackground(Color.clear)
             }
 
             Section("When") {

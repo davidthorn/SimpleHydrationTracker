@@ -12,5 +12,6 @@ internal enum SettingsRoute: Hashable {
     case reminderSettings
     case notificationPermissions
     case unitsSettings
+    case sipSizeSettings
     case dataManagement
 }

@@ -5,13 +5,17 @@
 //  Created by David Thorn on 15.02.2026.
 //
 
+import Models
 import SwiftUI
 
 internal struct SettingsView: View {
     @StateObject private var viewModel: SettingsViewModel
 
     internal init(serviceContainer: ServiceContainerProtocol) {
-        let vm = SettingsViewModel(unitsPreferenceService: serviceContainer.unitsPreferenceService)
+        let vm = SettingsViewModel(
+            unitsPreferenceService: serviceContainer.unitsPreferenceService,
+            sipSizePreferenceService: serviceContainer.sipSizePreferenceService
+        )
         _viewModel = StateObject(wrappedValue: vm)
     }
 
@@ -71,6 +75,13 @@ internal struct SettingsView: View {
                                 subtitle: viewModel.selectedUnit.settingsValueLabel,
                                 systemImage: "ruler",
                                 tint: AppTheme.accent
+                            ),
+                            SettingsRow(
+                                route: .sipSizeSettings,
+                                title: "Sip Size",
+                                subtitle: viewModel.selectedUnit.format(milliliters: viewModel.sipSize.milliliters),
+                                systemImage: "mouth",
+                                tint: AppTheme.success
                             )
                         ]
                     )

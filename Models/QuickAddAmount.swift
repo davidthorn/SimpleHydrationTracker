@@ -8,26 +8,34 @@
 import Foundation
 
 /// Preset hydration amounts used for quick logging.
-public enum QuickAddAmount: Int, CaseIterable, Codable, Hashable, Identifiable, Sendable {
-    case ml150 = 150
-    case ml250 = 250
-    case ml350 = 350
-    case ml500 = 500
-    case ml650 = 650
-    case ml750 = 750
+public struct QuickAddAmount: Codable, Hashable, Identifiable, Sendable {
+    public let milliliters: Int
 
-    /// Stable identifier for list rendering.
     public var id: Int {
-        rawValue
+        milliliters
     }
 
-    /// Amount represented in milliliters.
-    public var milliliters: Int {
-        rawValue
+    public init(milliliters: Int) {
+        self.milliliters = max(milliliters, 1)
     }
 
-    /// Short display label for UI.
     public var displayLabel: String {
-        "+\(rawValue) ml"
+        "+\(milliliters) ml"
+    }
+
+    public static func recommended(for sipSize: SipSizeOption) -> [QuickAddAmount] {
+        let base = sipSize.milliliters
+        let multiples = [
+            base,
+            base * 2,
+            base * 3,
+            base * 4
+        ]
+        let largerOptions = [250, 400, 600, 800]
+        let allOptions = Set(multiples + largerOptions)
+            .filter { $0 > 0 }
+            .sorted()
+
+        return allOptions.map { QuickAddAmount(milliliters: $0) }
     }
 }

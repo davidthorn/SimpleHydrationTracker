@@ -13,35 +13,43 @@ import Models
 internal final class TodayViewModel: ObservableObject {
     @Published internal private(set) var state: TodayViewState
     @Published internal private(set) var selectedUnit: SettingsVolumeUnit
+    @Published internal private(set) var quickAddOptions: [QuickAddAmount]
     @Published internal private(set) var latestEntryID: HydrationEntryIdentifier?
     @Published internal private(set) var intakeChartData: TodayIntakeChartData
 
     private let hydrationService: HydrationServiceProtocol
     private let goalService: GoalServiceProtocol
     private let unitsPreferenceService: UnitsPreferenceServiceProtocol
+    private let sipSizePreferenceService: SipSizePreferenceServiceProtocol
     private let calendar: Calendar
     private let nowProvider: () -> Date
     private var isSubscribed: Bool
     private var hydrationObservationTask: Task<Void, Never>?
     private var goalObservationTask: Task<Void, Never>?
     private var unitsObservationTask: Task<Void, Never>?
+    private var sipSizeObservationTask: Task<Void, Never>?
     private var latestEntries: [HydrationEntry]
     private var latestGoalMilliliters: Int
+    private var latestSipSize: SipSizeOption
 
     internal init(
         hydrationService: HydrationServiceProtocol,
         goalService: GoalServiceProtocol,
         unitsPreferenceService: UnitsPreferenceServiceProtocol,
+        sipSizePreferenceService: SipSizePreferenceServiceProtocol,
         calendar: Calendar = .current,
         nowProvider: @escaping () -> Date = { Date() }
     ) {
         self.hydrationService = hydrationService
         self.goalService = goalService
         self.unitsPreferenceService = unitsPreferenceService
+        self.sipSizePreferenceService = sipSizePreferenceService
         self.calendar = calendar
         self.nowProvider = nowProvider
         state = .loading(date: nowProvider())
         selectedUnit = .milliliters
+        latestSipSize = .ml30
+        quickAddOptions = QuickAddAmount.recommended(for: .ml30)
         latestEntryID = nil
         intakeChartData = .empty()
         isSubscribed = false
@@ -58,6 +66,9 @@ internal final class TodayViewModel: ObservableObject {
         unitsObservationTask = Task {
             await observeUnits()
         }
+        sipSizeObservationTask = Task {
+            await observeSipSize()
+        }
         hydrationObservationTask = Task {
             await observeHydrationEntries()
         }
@@ -70,6 +81,7 @@ internal final class TodayViewModel: ObservableObject {
         hydrationObservationTask?.cancel()
         goalObservationTask?.cancel()
         unitsObservationTask?.cancel()
+        sipSizeObservationTask?.cancel()
     }
 
     internal func addQuickAmount(_ quickAddAmount: QuickAddAmount) async throws {
@@ -144,6 +156,17 @@ internal final class TodayViewModel: ObservableObject {
                 return
             }
             selectedUnit = unit
+        }
+    }
+
+    private func observeSipSize() async {
+        let stream = await sipSizePreferenceService.observeSipSize()
+        for await sipSize in stream {
+            guard Task.isCancelled == false else {
+                return
+            }
+            latestSipSize = sipSize
+            quickAddOptions = QuickAddAmount.recommended(for: sipSize)
         }
     }
 
@@ -237,4 +260,5 @@ internal final class TodayViewModel: ObservableObject {
         let bucketStart = floor(rawValue / bucketSeconds) * bucketSeconds
         return Date(timeIntervalSinceReferenceDate: bucketStart)
     }
+
 }

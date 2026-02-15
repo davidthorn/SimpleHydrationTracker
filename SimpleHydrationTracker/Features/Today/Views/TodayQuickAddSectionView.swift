@@ -28,7 +28,7 @@ internal struct TodayQuickAddSectionView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Quick Add")
                     .font(.headline)
-                Text("Tap once to log common amounts.")
+                Text("Small sip-based amounts and larger one-tap options.")
                     .font(.caption)
                     .foregroundStyle(AppTheme.muted)
             }
@@ -46,10 +46,13 @@ internal struct TodayQuickAddSectionView: View {
                         onQuickAddTap(amount)
                     } label: {
                         VStack(spacing: 2) {
+                            Image(systemName: symbolName(for: amount.milliliters))
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(AppTheme.accent)
                             Text(selectedUnit.format(milliliters: amount.milliliters))
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(AppTheme.accent)
-                            Text("Quick log")
+                            Text(sizeDescription(for: amount.milliliters))
                                 .font(.caption2)
                                 .foregroundStyle(AppTheme.muted)
                         }
@@ -66,7 +69,7 @@ internal struct TodayQuickAddSectionView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Quick add \(selectedUnit.format(milliliters: amount.milliliters))")
-                    .accessibilityHint("Adds hydration instantly to today's total.")
+                    .accessibilityHint("\(sizeDescription(for: amount.milliliters)). Adds hydration instantly to today's total.")
                     .accessibilityIdentifier("today.quickAdd.\(amount.milliliters)")
                 }
             }
@@ -82,12 +85,58 @@ internal struct TodayQuickAddSectionView: View {
                 )
         )
     }
+
+    private func sizeDescription(for milliliters: Int) -> String {
+        switch milliliters {
+        case ..<40:
+            return "Small sip"
+        case ..<90:
+            return "Sip"
+        case ..<180:
+            return "Big sip"
+        case ..<320:
+            return "Small glass"
+        case ..<500:
+            return "Glass"
+        case ..<750:
+            return "Large glass"
+        default:
+            return "Bottle"
+        }
+    }
+
+    private func symbolName(for milliliters: Int) -> String {
+        switch milliliters {
+        case ..<40:
+            return "drop"
+        case ..<90:
+            return "drop.fill"
+        case ..<180:
+            return "takeoutbag.and.cup.and.straw"
+        case ..<320:
+            return "wineglass"
+        case ..<500:
+            return "mug"
+        case ..<750:
+            return "mug.fill"
+        default:
+            return "waterbottle"
+        }
+    }
 }
 
 #if DEBUG
     #Preview {
         TodayQuickAddSectionView(
-            quickAddOptions: QuickAddAmount.allCases,
+            quickAddOptions: [
+                QuickAddAmount(milliliters: 30),
+                QuickAddAmount(milliliters: 60),
+                QuickAddAmount(milliliters: 90),
+                QuickAddAmount(milliliters: 120),
+                QuickAddAmount(milliliters: 250),
+                QuickAddAmount(milliliters: 400),
+                QuickAddAmount(milliliters: 600)
+            ],
             selectedUnit: .milliliters
         ) { _ in }
             .padding()

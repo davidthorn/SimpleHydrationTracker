@@ -12,5 +12,6 @@ internal protocol ServiceContainerProtocol: Sendable {
     var goalService: GoalServiceProtocol { get }
     var reminderService: ReminderServiceProtocol { get }
     var unitsPreferenceService: UnitsPreferenceServiceProtocol { get }
+    var sipSizePreferenceService: SipSizePreferenceServiceProtocol { get }
     var historyFilterPreferenceService: HistoryFilterPreferenceServiceProtocol { get }
 }

@@ -14,6 +14,7 @@
         internal let goalService: GoalServiceProtocol
         internal let reminderService: ReminderServiceProtocol
         internal let unitsPreferenceService: UnitsPreferenceServiceProtocol
+        internal let sipSizePreferenceService: SipSizePreferenceServiceProtocol
         internal let historyFilterPreferenceService: HistoryFilterPreferenceServiceProtocol
 
         internal init() {
@@ -21,6 +22,7 @@
             goalService = PreviewGoalService()
             reminderService = PreviewReminderService()
             unitsPreferenceService = PreviewUnitsPreferenceService()
+            sipSizePreferenceService = PreviewSipSizePreferenceService()
             historyFilterPreferenceService = PreviewHistoryFilterPreferenceService()
         }
     }
@@ -119,5 +121,21 @@
         internal func updatePreferences(_ preferences: HistoryFilterPreferences) async {}
 
         internal func resetPreferences() async {}
+    }
+
+    internal actor PreviewSipSizePreferenceService: SipSizePreferenceServiceProtocol {
+        internal func observeSipSize() async -> AsyncStream<SipSizeOption> {
+            let streamPair = AsyncStream<SipSizeOption>.makeStream()
+            streamPair.continuation.yield(.ml30)
+            return streamPair.stream
+        }
+
+        internal func fetchSipSize() async -> SipSizeOption {
+            .ml30
+        }
+
+        internal func updateSipSize(_ sipSize: SipSizeOption) async {}
+
+        internal func resetSipSize() async {}
     }
 #endif

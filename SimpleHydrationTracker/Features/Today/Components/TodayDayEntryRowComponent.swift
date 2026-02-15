@@ -14,7 +14,7 @@ internal struct TodayDayEntryRowComponent: View {
 
     internal var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "drop.fill")
+            Image(systemName: symbolName(for: entry.amountMilliliters))
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(AppTheme.accent)
                 .frame(width: 28, height: 28)
@@ -27,6 +27,9 @@ internal struct TodayDayEntryRowComponent: View {
                 Text(selectedUnit.format(milliliters: entry.amountMilliliters))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
+                Text(intakeDescription(for: entry.amountMilliliters))
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.muted)
                 Text(entry.consumedAt.formatted(date: .abbreviated, time: .shortened))
                     .font(.caption)
                     .foregroundStyle(AppTheme.muted)
@@ -46,8 +49,48 @@ internal struct TodayDayEntryRowComponent: View {
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Hydration entry")
-        .accessibilityValue("\(selectedUnit.format(milliliters: entry.amountMilliliters)), \(entry.consumedAt.formatted(date: .abbreviated, time: .shortened))")
+        .accessibilityValue(
+            "\(selectedUnit.format(milliliters: entry.amountMilliliters)), \(intakeDescription(for: entry.amountMilliliters)), \(entry.consumedAt.formatted(date: .abbreviated, time: .shortened))"
+        )
         .accessibilityHint("Opens entry details.")
+    }
+
+    private func intakeDescription(for milliliters: Int) -> String {
+        switch milliliters {
+        case ..<40:
+            return "Small sip intake"
+        case ..<90:
+            return "Sip intake"
+        case ..<180:
+            return "Big sip intake"
+        case ..<320:
+            return "Small glass intake"
+        case ..<500:
+            return "Glass intake"
+        case ..<750:
+            return "Large glass intake"
+        default:
+            return "Bottle intake"
+        }
+    }
+
+    private func symbolName(for milliliters: Int) -> String {
+        switch milliliters {
+        case ..<40:
+            return "drop"
+        case ..<90:
+            return "drop.fill"
+        case ..<180:
+            return "takeoutbag.and.cup.and.straw"
+        case ..<320:
+            return "wineglass"
+        case ..<500:
+            return "mug"
+        case ..<750:
+            return "mug.fill"
+        default:
+            return "waterbottle"
+        }
     }
 }
 

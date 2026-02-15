@@ -13,17 +13,13 @@ internal struct TodayView: View {
     @StateObject private var viewModel: TodayViewModel
     @State private var quickAddErrorMessage: String?
     @State private var quickAddSuccessMessage: String?
-    private let quickAddOptions: [QuickAddAmount]
 
-    internal init(
-        serviceContainer: ServiceContainerProtocol,
-        quickAddOptions: [QuickAddAmount] = QuickAddAmount.allCases
-    ) {
-        self.quickAddOptions = quickAddOptions
+    internal init(serviceContainer: ServiceContainerProtocol) {
         let vm = TodayViewModel(
             hydrationService: serviceContainer.hydrationService,
             goalService: serviceContainer.goalService,
-            unitsPreferenceService: serviceContainer.unitsPreferenceService
+            unitsPreferenceService: serviceContainer.unitsPreferenceService,
+            sipSizePreferenceService: serviceContainer.sipSizePreferenceService
         )
         _viewModel = StateObject(wrappedValue: vm)
     }
@@ -51,7 +47,7 @@ internal struct TodayView: View {
                     )
 
                     TodayQuickAddSectionView(
-                        quickAddOptions: quickAddOptions,
+                        quickAddOptions: viewModel.quickAddOptions,
                         selectedUnit: viewModel.selectedUnit
                     ) { amount in
                         Task {
