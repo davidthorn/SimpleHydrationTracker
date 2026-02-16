@@ -14,4 +14,6 @@ internal protocol ServiceContainerProtocol: Sendable {
     var unitsPreferenceService: UnitsPreferenceServiceProtocol { get }
     var sipSizePreferenceService: SipSizePreferenceServiceProtocol { get }
     var historyFilterPreferenceService: HistoryFilterPreferenceServiceProtocol { get }
+    var healthKitHydrationService: HealthKitHydrationServiceProtocol { get }
+    var hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol { get }
 }

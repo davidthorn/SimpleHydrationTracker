@@ -29,6 +29,8 @@ internal struct SettingsScene: View {
                         UnitsSettingsView(serviceContainer: serviceContainer)
                     case .sipSizeSettings:
                         SipSizeSettingsView(serviceContainer: serviceContainer)
+                    case .healthKitSettings:
+                        HealthKitSettingsView(serviceContainer: serviceContainer)
                     case .dataManagement:
                         DataManagementView(serviceContainer: serviceContainer)
                     }

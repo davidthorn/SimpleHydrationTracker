@@ -16,48 +16,38 @@
         internal let unitsPreferenceService: UnitsPreferenceServiceProtocol
         internal let sipSizePreferenceService: SipSizePreferenceServiceProtocol
         internal let historyFilterPreferenceService: HistoryFilterPreferenceServiceProtocol
+        internal let healthKitHydrationService: HealthKitHydrationServiceProtocol
+        internal let hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
 
         internal init() {
-            hydrationService = PreviewHydrationService()
-            goalService = PreviewGoalService()
+            let previewFilePathResolver = StoreFilePathResolver()
+            let previewCodec = StoreJSONCodec()
+
+            let previewHydrationStore = HydrationStore(
+                fileName: "preview_hydration_entries.json",
+                filePathResolver: previewFilePathResolver,
+                codec: previewCodec
+            )
+            let previewGoalStore = GoalStore(
+                fileName: "preview_hydration_goal.json",
+                filePathResolver: previewFilePathResolver,
+                codec: previewCodec
+            )
+            let previewSyncMetadataStore = HydrationEntrySyncMetadataStore(
+                fileName: "preview_hydration_entry_sync_metadata.json",
+                filePathResolver: previewFilePathResolver,
+                codec: previewCodec
+            )
+
+            hydrationService = HydrationService(hydrationStore: previewHydrationStore)
+            goalService = GoalService(goalStore: previewGoalStore)
             reminderService = PreviewReminderService()
             unitsPreferenceService = PreviewUnitsPreferenceService()
             sipSizePreferenceService = PreviewSipSizePreferenceService()
             historyFilterPreferenceService = PreviewHistoryFilterPreferenceService()
+            healthKitHydrationService = HealthKitHydrationService(autoSyncKey: "preview_hydration_healthkit_auto_sync_enabled")
+            hydrationEntrySyncMetadataService = HydrationEntrySyncMetadataService(store: previewSyncMetadataStore)
         }
-    }
-
-    internal actor PreviewHydrationService: HydrationServiceProtocol {
-        internal func observeEntries() async throws -> AsyncStream<[HydrationEntry]> {
-            let streamPair = AsyncStream<[HydrationEntry]>.makeStream()
-            streamPair.continuation.yield([])
-            return streamPair.stream
-        }
-
-        internal func fetchEntries() async throws -> [HydrationEntry] {
-            []
-        }
-
-        internal func upsertEntry(_ entry: HydrationEntry) async throws {}
-
-        internal func deleteEntry(id: HydrationEntryIdentifier) async throws {}
-
-    }
-
-    internal actor PreviewGoalService: GoalServiceProtocol {
-        internal func observeGoal() async throws -> AsyncStream<HydrationGoal?> {
-            let streamPair = AsyncStream<HydrationGoal?>.makeStream()
-            streamPair.continuation.yield(nil)
-            return streamPair.stream
-        }
-
-        internal func fetchGoal() async throws -> HydrationGoal? {
-            nil
-        }
-
-        internal func upsertGoal(_ goal: HydrationGoal) async throws {}
-
-        internal func deleteGoal() async throws {}
     }
 
     internal actor PreviewReminderService: ReminderServiceProtocol {

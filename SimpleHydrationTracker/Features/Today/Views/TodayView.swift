@@ -19,7 +19,9 @@ internal struct TodayView: View {
             hydrationService: serviceContainer.hydrationService,
             goalService: serviceContainer.goalService,
             unitsPreferenceService: serviceContainer.unitsPreferenceService,
-            sipSizePreferenceService: serviceContainer.sipSizePreferenceService
+            sipSizePreferenceService: serviceContainer.sipSizePreferenceService,
+            healthKitHydrationService: serviceContainer.healthKitHydrationService,
+            hydrationEntrySyncMetadataService: serviceContainer.hydrationEntrySyncMetadataService
         )
         _viewModel = StateObject(wrappedValue: vm)
     }

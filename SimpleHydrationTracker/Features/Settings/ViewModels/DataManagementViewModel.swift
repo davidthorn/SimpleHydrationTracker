@@ -18,13 +18,19 @@ internal final class DataManagementViewModel: ObservableObject {
 
     private let hydrationService: HydrationServiceProtocol
     private let goalService: GoalServiceProtocol
+    private let healthKitHydrationService: HealthKitHydrationServiceProtocol
+    private let hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
 
     internal init(
         hydrationService: HydrationServiceProtocol,
-        goalService: GoalServiceProtocol
+        goalService: GoalServiceProtocol,
+        healthKitHydrationService: HealthKitHydrationServiceProtocol,
+        hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
     ) {
         self.hydrationService = hydrationService
         self.goalService = goalService
+        self.healthKitHydrationService = healthKitHydrationService
+        self.hydrationEntrySyncMetadataService = hydrationEntrySyncMetadataService
         isExporting = false
         isDeletingAll = false
         errorMessage = nil
@@ -52,9 +58,14 @@ internal final class DataManagementViewModel: ObservableObject {
         do {
             let entries = try await hydrationService.fetchEntries()
             for entry in entries {
+                guard Task.isCancelled == false else {
+                    return
+                }
                 try await hydrationService.deleteEntry(id: HydrationEntryIdentifier(value: entry.id))
             }
             try await goalService.deleteGoal()
+            await healthKitHydrationService.resetAutoSyncEnabled()
+            try await hydrationEntrySyncMetadataService.deleteAllMetadata()
             exportResultMessage = nil
             errorMessage = nil
         } catch {

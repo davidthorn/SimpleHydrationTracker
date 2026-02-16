@@ -14,7 +14,8 @@ internal struct SettingsView: View {
     internal init(serviceContainer: ServiceContainerProtocol) {
         let vm = SettingsViewModel(
             unitsPreferenceService: serviceContainer.unitsPreferenceService,
-            sipSizePreferenceService: serviceContainer.sipSizePreferenceService
+            sipSizePreferenceService: serviceContainer.sipSizePreferenceService,
+            healthKitHydrationService: serviceContainer.healthKitHydrationService
         )
         _viewModel = StateObject(wrappedValue: vm)
     }
@@ -89,6 +90,13 @@ internal struct SettingsView: View {
                     SettingsRouteSectionComponent(
                         title: "Data",
                         rows: [
+                            SettingsRow(
+                                route: .healthKitSettings,
+                                title: "HealthKit",
+                                subtitle: viewModel.healthKitSubtitle,
+                                systemImage: "heart.text.square.fill",
+                                tint: AppTheme.error
+                            ),
                             SettingsRow(
                                 route: .dataManagement,
                                 title: "Data Management",

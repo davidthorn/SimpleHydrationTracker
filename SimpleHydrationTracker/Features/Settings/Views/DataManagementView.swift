@@ -15,7 +15,9 @@ internal struct DataManagementView: View {
     internal init(serviceContainer: ServiceContainerProtocol) {
         let vm = DataManagementViewModel(
             hydrationService: serviceContainer.hydrationService,
-            goalService: serviceContainer.goalService
+            goalService: serviceContainer.goalService,
+            healthKitHydrationService: serviceContainer.healthKitHydrationService,
+            hydrationEntrySyncMetadataService: serviceContainer.hydrationEntrySyncMetadataService
         )
         _viewModel = StateObject(wrappedValue: vm)
         _showDeleteConfirmation = State(initialValue: false)
@@ -26,7 +28,7 @@ internal struct DataManagementView: View {
             Section {
                 SettingsHeroCardComponent(
                     title: "Data Management",
-                    message: "Export records for review or delete all hydration data when needed.",
+                    message: "Export records for review or delete all hydration and sync data when needed.",
                     systemImage: "tray.full",
                     tint: AppTheme.error
                 )

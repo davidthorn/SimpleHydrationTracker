@@ -15,23 +15,28 @@ internal final class SettingsViewModel: ObservableObject {
     @Published internal private(set) var isLoading: Bool
     @Published internal private(set) var selectedUnit: SettingsVolumeUnit
     @Published internal private(set) var sipSize: SipSizeOption
+    @Published internal private(set) var healthKitPermissionState: HealthKitHydrationPermissionState
 
     private let unitsPreferenceService: UnitsPreferenceServiceProtocol
     private let sipSizePreferenceService: SipSizePreferenceServiceProtocol
+    private let healthKitHydrationService: HealthKitHydrationServiceProtocol
     private var hasLoaded: Bool
     private var unitsObservationTask: Task<Void, Never>?
     private var sipSizeObservationTask: Task<Void, Never>?
 
     internal init(
         unitsPreferenceService: UnitsPreferenceServiceProtocol,
-        sipSizePreferenceService: SipSizePreferenceServiceProtocol
+        sipSizePreferenceService: SipSizePreferenceServiceProtocol,
+        healthKitHydrationService: HealthKitHydrationServiceProtocol
     ) {
         self.unitsPreferenceService = unitsPreferenceService
         self.sipSizePreferenceService = sipSizePreferenceService
+        self.healthKitHydrationService = healthKitHydrationService
         errorMessage = nil
         isLoading = false
         selectedUnit = .milliliters
         sipSize = .ml30
+        healthKitPermissionState = .unavailable()
         hasLoaded = false
     }
 
@@ -43,6 +48,7 @@ internal final class SettingsViewModel: ObservableObject {
         hasLoaded = true
         isLoading = true
         errorMessage = nil
+        healthKitPermissionState = await healthKitHydrationService.fetchPermissionState()
         unitsObservationTask = Task {
             await observeUnits()
         }
@@ -83,5 +89,9 @@ internal final class SettingsViewModel: ObservableObject {
             }
             sipSize = currentSipSize
         }
+    }
+
+    internal var healthKitSubtitle: String {
+        "Read: \(healthKitPermissionState.read.displayText) • Write: \(healthKitPermissionState.write.displayText)"
     }
 }

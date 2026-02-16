@@ -16,7 +16,9 @@ internal struct AddCustomAmountView: View {
         let vm = AddCustomAmountViewModel(
             hydrationService: serviceContainer.hydrationService,
             unitsPreferenceService: serviceContainer.unitsPreferenceService,
-            sipSizePreferenceService: serviceContainer.sipSizePreferenceService
+            sipSizePreferenceService: serviceContainer.sipSizePreferenceService,
+            healthKitHydrationService: serviceContainer.healthKitHydrationService,
+            hydrationEntrySyncMetadataService: serviceContainer.hydrationEntrySyncMetadataService
         )
         _viewModel = StateObject(wrappedValue: vm)
         _isSaving = State(initialValue: false)

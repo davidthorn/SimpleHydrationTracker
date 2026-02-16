@@ -23,7 +23,9 @@ internal struct EditTodayEntryView: View {
         let vm = EditTodayEntryViewModel(
             entryID: entryID,
             hydrationService: serviceContainer.hydrationService,
-            unitsPreferenceService: serviceContainer.unitsPreferenceService
+            unitsPreferenceService: serviceContainer.unitsPreferenceService,
+            healthKitHydrationService: serviceContainer.healthKitHydrationService,
+            hydrationEntrySyncMetadataService: serviceContainer.hydrationEntrySyncMetadataService
         )
         _viewModel = StateObject(wrappedValue: vm)
         _showDeleteConfirmation = State(initialValue: false)
@@ -66,6 +68,26 @@ internal struct EditTodayEntryView: View {
                     )
                     .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
                     .listRowBackground(Color.clear)
+                }
+            }
+
+            if viewModel.hasPersistedEntry {
+                Section("HealthKit Sync") {
+                    Text(viewModel.syncStatusText)
+                        .font(.footnote)
+                        .foregroundStyle(AppTheme.muted)
+
+                    if viewModel.syncMetadata == nil {
+                        Button(viewModel.isSyncingToHealthKit ? "Syncing..." : "Sync Entry to HealthKit") {
+                            Task {
+                                guard Task.isCancelled == false else {
+                                    return
+                                }
+                                await viewModel.syncPersistedEntryToHealthKit()
+                            }
+                        }
+                        .disabled(viewModel.isSyncingToHealthKit || viewModel.canSyncToHealthKit == false)
+                    }
                 }
             }
 
@@ -147,6 +169,12 @@ internal struct EditTodayEntryView: View {
                 return
             }
             await viewModel.loadIfNeeded()
+        }
+        .task {
+            guard Task.isCancelled == false else {
+                return
+            }
+            await viewModel.refreshSyncStatus()
         }
     }
 }

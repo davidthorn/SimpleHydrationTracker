@@ -1,0 +1,101 @@
+//
+//  HealthKitSettingsView.swift
+//  SimpleHydrationTracker
+//
+//  Created by David Thorn on 16.02.2026.
+//
+
+import SwiftUI
+import UIKit
+
+internal struct HealthKitSettingsView: View {
+    @Environment(\.openURL) private var openURL
+    @StateObject private var viewModel: HealthKitSettingsViewModel
+
+    internal init(serviceContainer: ServiceContainerProtocol) {
+        let vm = HealthKitSettingsViewModel(serviceContainer: serviceContainer)
+        _viewModel = StateObject(wrappedValue: vm)
+    }
+
+    internal var body: some View {
+        ZStack {
+            AppTheme.pageGradient
+                .ignoresSafeArea()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    SettingsHeroCardComponent(
+                        title: "Health Integration",
+                        message: "Choose whether new hydration entries should be written to Apple Health.",
+                        systemImage: "heart.text.square.fill",
+                        tint: AppTheme.error
+                    )
+
+                    HealthKitPermissionsCardComponent(
+                        permissionState: viewModel.permissionState,
+                        statusSummaryText: viewModel.statusSummaryText,
+                        isHealthKitAvailable: viewModel.isHealthKitAvailable,
+                        onRequestAccess: {
+                            Task {
+                                if Task.isCancelled { return }
+                                await viewModel.requestPermissions()
+                            }
+                        },
+                        onOpenSettings: {
+                            guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else {
+                                return
+                            }
+                            openURL(settingsURL)
+                        }
+                    )
+
+                    HealthKitAutoSyncCardComponent(
+                        isAutoSyncEnabled: Binding(
+                            get: { viewModel.isAutoSyncEnabled },
+                            set: { newValue in
+                                Task {
+                                    if Task.isCancelled { return }
+                                    await viewModel.setAutoSyncEnabled(newValue)
+                                }
+                            }
+                        ),
+                        isHealthKitAvailable: viewModel.isHealthKitAvailable
+                    )
+
+                    if let errorMessage = viewModel.errorMessage {
+                        SettingsStatusCardComponent(
+                            title: "HealthKit Error",
+                            message: errorMessage,
+                            systemImage: "exclamationmark.triangle.fill",
+                            tint: AppTheme.error
+                        )
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+            }
+        }
+        .navigationTitle("HealthKit")
+        .tint(AppTheme.accent)
+        .task {
+            if Task.isCancelled { return }
+            await viewModel.load()
+        }
+        .task {
+            if Task.isCancelled { return }
+            await viewModel.observeAutoSync()
+        }
+        .task {
+            if Task.isCancelled { return }
+            await viewModel.observeAppDidBecomeActive()
+        }
+    }
+}
+
+#if DEBUG
+    #Preview {
+        NavigationStack {
+            HealthKitSettingsView(serviceContainer: PreviewServiceContainer())
+        }
+    }
+#endif

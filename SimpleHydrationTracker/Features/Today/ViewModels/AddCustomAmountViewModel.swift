@@ -20,6 +20,8 @@ internal final class AddCustomAmountViewModel: ObservableObject {
     private let hydrationService: HydrationServiceProtocol
     private let unitsPreferenceService: UnitsPreferenceServiceProtocol
     private let sipSizePreferenceService: SipSizePreferenceServiceProtocol
+    private let healthKitHydrationService: HealthKitHydrationServiceProtocol
+    private let hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
     private let nowProvider: () -> Date
     private var hasStarted: Bool
     private var unitsObservationTask: Task<Void, Never>?
@@ -29,11 +31,15 @@ internal final class AddCustomAmountViewModel: ObservableObject {
         hydrationService: HydrationServiceProtocol,
         unitsPreferenceService: UnitsPreferenceServiceProtocol,
         sipSizePreferenceService: SipSizePreferenceServiceProtocol,
+        healthKitHydrationService: HealthKitHydrationServiceProtocol,
+        hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol,
         nowProvider: @escaping () -> Date = { Date() }
     ) {
         self.hydrationService = hydrationService
         self.unitsPreferenceService = unitsPreferenceService
         self.sipSizePreferenceService = sipSizePreferenceService
+        self.healthKitHydrationService = healthKitHydrationService
+        self.hydrationEntrySyncMetadataService = hydrationEntrySyncMetadataService
         self.nowProvider = nowProvider
         amountText = ""
         consumedAt = nowProvider()
@@ -79,6 +85,16 @@ internal final class AddCustomAmountViewModel: ObservableObject {
         )
 
         try await hydrationService.upsertEntry(entry)
+        let externalIdentifier = try await healthKitHydrationService.syncEntryIfEnabled(entry)
+        if let externalIdentifier {
+            let metadata = HydrationEntrySyncMetadata(
+                entryID: entry.id,
+                providerIdentifier: healthKitHydrationService.providerIdentifier,
+                externalIdentifier: externalIdentifier,
+                syncedAt: nowProvider()
+            )
+            try await hydrationEntrySyncMetadataService.upsertMetadata(metadata)
+        }
         errorMessage = nil
     }
 

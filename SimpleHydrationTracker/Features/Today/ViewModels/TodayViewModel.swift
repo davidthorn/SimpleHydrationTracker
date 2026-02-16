@@ -21,6 +21,8 @@ internal final class TodayViewModel: ObservableObject {
     private let goalService: GoalServiceProtocol
     private let unitsPreferenceService: UnitsPreferenceServiceProtocol
     private let sipSizePreferenceService: SipSizePreferenceServiceProtocol
+    private let healthKitHydrationService: HealthKitHydrationServiceProtocol
+    private let hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
     private let calendar: Calendar
     private let nowProvider: () -> Date
     private var isSubscribed: Bool
@@ -37,6 +39,8 @@ internal final class TodayViewModel: ObservableObject {
         goalService: GoalServiceProtocol,
         unitsPreferenceService: UnitsPreferenceServiceProtocol,
         sipSizePreferenceService: SipSizePreferenceServiceProtocol,
+        healthKitHydrationService: HealthKitHydrationServiceProtocol,
+        hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol,
         calendar: Calendar = .current,
         nowProvider: @escaping () -> Date = { Date() }
     ) {
@@ -44,6 +48,8 @@ internal final class TodayViewModel: ObservableObject {
         self.goalService = goalService
         self.unitsPreferenceService = unitsPreferenceService
         self.sipSizePreferenceService = sipSizePreferenceService
+        self.healthKitHydrationService = healthKitHydrationService
+        self.hydrationEntrySyncMetadataService = hydrationEntrySyncMetadataService
         self.calendar = calendar
         self.nowProvider = nowProvider
         state = .loading(date: nowProvider())
@@ -93,6 +99,16 @@ internal final class TodayViewModel: ObservableObject {
         )
 
         try await hydrationService.upsertEntry(entry)
+        let externalIdentifier = try await healthKitHydrationService.syncEntryIfEnabled(entry)
+        if let externalIdentifier {
+            let metadata = HydrationEntrySyncMetadata(
+                entryID: entry.id,
+                providerIdentifier: healthKitHydrationService.providerIdentifier,
+                externalIdentifier: externalIdentifier,
+                syncedAt: nowProvider()
+            )
+            try await hydrationEntrySyncMetadataService.upsertMetadata(metadata)
+        }
     }
 
     private func observeHydrationEntries() async {

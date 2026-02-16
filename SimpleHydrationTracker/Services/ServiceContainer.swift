@@ -14,10 +14,13 @@ internal struct ServiceContainer: ServiceContainerProtocol {
     internal let unitsPreferenceService: UnitsPreferenceServiceProtocol
     internal let sipSizePreferenceService: SipSizePreferenceServiceProtocol
     internal let historyFilterPreferenceService: HistoryFilterPreferenceServiceProtocol
+    internal let healthKitHydrationService: HealthKitHydrationServiceProtocol
+    internal let hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
 
     internal init(
         hydrationStore: HydrationStoreProtocol = HydrationStore(),
-        goalStore: GoalStoreProtocol = GoalStore()
+        goalStore: GoalStoreProtocol = GoalStore(),
+        hydrationEntrySyncMetadataStore: HydrationEntrySyncMetadataStoreProtocol = HydrationEntrySyncMetadataStore()
     ) {
         hydrationService = HydrationService(hydrationStore: hydrationStore)
         goalService = GoalService(goalStore: goalStore)
@@ -25,5 +28,7 @@ internal struct ServiceContainer: ServiceContainerProtocol {
         unitsPreferenceService = UnitsPreferenceService()
         sipSizePreferenceService = SipSizePreferenceService()
         historyFilterPreferenceService = HistoryFilterPreferenceService()
+        healthKitHydrationService = HealthKitHydrationService()
+        hydrationEntrySyncMetadataService = HydrationEntrySyncMetadataService(store: hydrationEntrySyncMetadataStore)
     }
 }
