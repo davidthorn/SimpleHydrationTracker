@@ -72,7 +72,7 @@ internal struct AddCustomAmountView: View {
 
             if let errorMessage = viewModel.errorMessage {
                 Section {
-                    TodayStatusCardComponent(
+                    SimpleStatusCard(
                         title: "Unable to Save",
                         message: errorMessage,
                         systemImage: "exclamationmark.triangle.fill",

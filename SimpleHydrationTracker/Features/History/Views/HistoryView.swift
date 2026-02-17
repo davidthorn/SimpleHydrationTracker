@@ -8,6 +8,7 @@
 import Foundation
 import Models
 import SwiftUI
+import SimpleFramework
 
 internal struct HistoryView: View {
     @StateObject private var viewModel: HistoryViewModel
@@ -36,7 +37,7 @@ internal struct HistoryView: View {
                     }
 
                     if let errorMessage = viewModel.errorMessage {
-                        HistoryStatusCardComponent(
+                        SimpleStatusCard(
                             title: "Unable to Load History",
                             message: errorMessage,
                             systemImage: "exclamationmark.triangle.fill",
@@ -45,7 +46,7 @@ internal struct HistoryView: View {
                     }
 
                     if viewModel.daySummaries.isEmpty, viewModel.isLoading == false {
-                        HistoryStatusCardComponent(
+                        SimpleStatusCard(
                             title: "No History Yet",
                             message: "Log water from Today and your daily history will appear here.",
                             systemImage: "drop",

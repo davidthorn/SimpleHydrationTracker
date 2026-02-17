@@ -39,7 +39,7 @@ internal struct DayDetailView: View {
                         tint: AppTheme.success
                     )
 
-                    TodayStatusCardComponent(
+                    SimpleStatusCard(
                         title: "Daily Total",
                         message: viewModel.selectedUnit.format(milliliters: viewModel.totalMilliliters),
                         systemImage: "drop.fill",
@@ -47,7 +47,7 @@ internal struct DayDetailView: View {
                     )
 
                     if viewModel.entries.isEmpty {
-                        TodayStatusCardComponent(
+                        SimpleStatusCard(
                             title: "No Entries Yet",
                             message: "No hydration entries were logged for this day.",
                             systemImage: "drop",
@@ -70,7 +70,7 @@ internal struct DayDetailView: View {
                     }
 
                     if let errorMessage = viewModel.errorMessage {
-                        TodayStatusCardComponent(
+                        SimpleStatusCard(
                             title: "Unable to Load Day",
                             message: errorMessage,
                             systemImage: "exclamationmark.triangle.fill",

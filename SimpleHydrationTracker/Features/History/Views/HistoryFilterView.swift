@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Models
+import SimpleFramework
 
 internal struct HistoryFilterView: View {
     @StateObject private var viewModel: HistoryFilterViewModel
@@ -19,7 +20,7 @@ internal struct HistoryFilterView: View {
     internal var body: some View {
         Form {
             Section {
-                HistoryStatusCardComponent(
+                SimpleStatusCard(
                     title: "History Filter",
                     message: "Adjust what appears in history to focus on specific data.",
                     systemImage: "line.3.horizontal.decrease.circle",

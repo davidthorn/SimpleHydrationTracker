@@ -5,7 +5,6 @@
 //  Created by David Thorn on 15.02.2026.
 //
 
-import Foundation
 import SwiftUI
 import SimpleFramework
 
@@ -39,7 +38,24 @@ internal struct ReminderSettingsView: View {
                     )
 
                     permissionCard
-                    scheduleCard
+                    SimpleReminderScheduleCard(
+                        isEnabled: $viewModel.isEnabled,
+                        startHour: $viewModel.startHour,
+                        endHour: $viewModel.endHour,
+                        intervalMinutes: $viewModel.intervalMinutes,
+                        title: "Schedule",
+                        enabledTitle: "Enable Reminders",
+                        enabledMessage: "Allow scheduled hydration nudges.",
+                        startHourTitle: "Start Hour",
+                        endHourTitle: "End Hour",
+                        intervalTitle: "Interval Minutes",
+                        disabledMessage: "Enable reminders to configure start, end, and interval.",
+                        tint: AppTheme.accent,
+                        startValueTint: AppTheme.accent,
+                        endValueTint: AppTheme.success,
+                        intervalValueTint: AppTheme.warning,
+                        isInputEnabled: viewModel.isLoading == false && isSaving == false && isDeleting == false
+                    )
 
                     if let errorMessage = viewModel.errorMessage {
                         SimpleFormErrorCard(message: errorMessage, tint: AppTheme.error)
@@ -177,60 +193,6 @@ internal struct ReminderSettingsView: View {
         }
     }
 
-    private var scheduleCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            fieldTitle("Schedule")
-
-            SimpleToggleCardRow(
-                isOn: $viewModel.isEnabled,
-                title: "Enable Reminders",
-                message: "Allow scheduled hydration nudges.",
-                systemImage: "bell.badge.fill",
-                tint: AppTheme.accent,
-                isEnabled: viewModel.isLoading == false && isSaving == false && isDeleting == false
-            )
-
-            if viewModel.isEnabled {
-                Picker("Start", selection: $viewModel.startHour) {
-                    ForEach(0..<24, id: \.self) { hour in
-                        Text(String(format: "%02d:00", hour)).tag(hour)
-                    }
-                }
-                .disabled(viewModel.isLoading || isSaving || isDeleting)
-
-                Picker("End", selection: $viewModel.endHour) {
-                    ForEach(1..<24, id: \.self) { hour in
-                        Text(String(format: "%02d:00", hour)).tag(hour)
-                    }
-                }
-                .disabled(viewModel.isLoading || isSaving || isDeleting)
-
-                Picker("Interval", selection: $viewModel.intervalMinutes) {
-                    Text("30 min").tag(30)
-                    Text("60 min").tag(60)
-                    Text("90 min").tag(90)
-                    Text("120 min").tag(120)
-                    Text("180 min").tag(180)
-                }
-                .disabled(viewModel.isLoading || isSaving || isDeleting)
-            }
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(AppTheme.cardBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(AppTheme.muted.opacity(0.2), lineWidth: 1)
-                )
-        )
-    }
-
-    private func fieldTitle(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.caption.weight(.bold))
-            .foregroundStyle(AppTheme.muted)
-    }
 }
 
 #if DEBUG

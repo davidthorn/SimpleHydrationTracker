@@ -81,7 +81,7 @@ internal struct TodayView: View {
                     )
 
                     if let errorMessage = viewModel.state.errorMessage {
-                        TodayStatusCardComponent(
+                        SimpleStatusCard(
                             title: "Unable to Refresh Today",
                             message: errorMessage,
                             systemImage: "exclamationmark.triangle.fill",
