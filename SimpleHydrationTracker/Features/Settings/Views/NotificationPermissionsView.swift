@@ -32,7 +32,6 @@ internal struct NotificationPermissionsView: View {
                     )
 
                     statusCard
-                    actionsCard
 
                     if let errorMessage = viewModel.errorMessage {
                         SimpleFormErrorCard(message: errorMessage, tint: AppTheme.error)
@@ -72,68 +71,54 @@ internal struct NotificationPermissionsView: View {
     private var statusCard: some View {
         switch viewModel.status {
         case .authorized:
-            SimpleStatusCard(
+            SimpleInfoActionCard(
                 title: "Authorized",
-                message: "Notifications are enabled for this app.",
+                subtitle: "Notifications are enabled for this app.",
                 systemImage: "checkmark.seal.fill",
                 tint: AppTheme.success
             )
         case .provisional:
-            SimpleStatusCard(
+            SimpleInfoActionCard(
                 title: "Provisional Access",
-                message: "Notifications can be delivered quietly.",
+                subtitle: "Notifications can be delivered quietly.",
                 systemImage: "bell.badge",
                 tint: AppTheme.warning
             )
         case .notDetermined:
-            SimpleStatusCard(
+            SimpleInfoActionCard(
                 title: "Not Requested",
-                message: "Request permission to enable reminders.",
+                subtitle: "Request permission to enable reminders.",
                 systemImage: "questionmark.circle",
-                tint: AppTheme.warning
+                tint: AppTheme.warning,
+                actionTitle: "Request Permission",
+                actionSystemImage: "bell.badge.fill",
+                actionTint: AppTheme.accent,
+                isActionEnabled: viewModel.isLoading == false,
+                action: {
+                    Task {
+                        guard Task.isCancelled == false else {
+                            return
+                        }
+                        await viewModel.requestPermission()
+                    }
+                }
             )
         case .denied:
-            SimpleStatusCard(
+            SimpleInfoActionCard(
                 title: "Denied",
-                message: "Open iOS Settings to enable notifications.",
+                subtitle: "Open iOS Settings to enable notifications.",
                 systemImage: "xmark.octagon.fill",
-                tint: AppTheme.error
-            )
-        }
-    }
-
-    @ViewBuilder
-    private var actionsCard: some View {
-        if viewModel.status == .notDetermined {
-            SimpleActionButton(
-                title: "Request Permission",
-                systemImage: "bell.badge.fill",
-                tint: AppTheme.accent,
-                style: .filled,
-                isEnabled: viewModel.isLoading == false
-            ) {
-                Task {
-                    guard Task.isCancelled == false else {
+                tint: AppTheme.error,
+                actionTitle: "Open Settings",
+                actionSystemImage: "gearshape.fill",
+                actionTint: AppTheme.warning,
+                action: {
+                    guard let url = URL(string: UIApplication.openSettingsURLString) else {
                         return
                     }
-                    await viewModel.requestPermission()
+                    UIApplication.shared.open(url)
                 }
-            }
-        }
-
-        if viewModel.status == .denied {
-            SimpleActionButton(
-                title: "Open Settings",
-                systemImage: "gearshape.fill",
-                tint: AppTheme.warning,
-                style: .filled,
-                isEnabled: true
-            ) {
-                guard let url = URL(string: UIApplication.openSettingsURLString) else {
-                    return
-                }
-                UIApplication.shared.open(url)
-            }
+            )
         }
     }
 }

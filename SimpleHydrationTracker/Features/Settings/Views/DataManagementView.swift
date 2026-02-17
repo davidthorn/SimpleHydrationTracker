@@ -39,14 +39,16 @@ internal struct DataManagementView: View {
                     )
 
                     sectionTitle("Export")
-                    actionCard {
-                        SimpleActionButton(
-                            title: "Prepare Export",
-                            systemImage: "square.and.arrow.up",
-                            tint: AppTheme.success,
-                            style: .filled,
-                            isEnabled: viewModel.isExporting == false && viewModel.isDeletingAll == false
-                        ) {
+                    SimpleInfoActionCard(
+                        title: "Prepare Export",
+                        subtitle: "Create export output for your hydration records.",
+                        systemImage: "square.and.arrow.up",
+                        tint: AppTheme.success,
+                        actionTitle: "Prepare Export",
+                        actionSystemImage: "square.and.arrow.up",
+                        actionTint: AppTheme.success,
+                        isActionEnabled: viewModel.isExporting == false && viewModel.isDeletingAll == false,
+                        action: {
                             Task {
                                 guard Task.isCancelled == false else {
                                     return
@@ -54,45 +56,46 @@ internal struct DataManagementView: View {
                                 await viewModel.exportData()
                             }
                         }
-                    }
+                    )
 
                     if let exportMessage = viewModel.exportResultMessage {
-                        SimpleStatusCard(
-                            title: "Export Ready",
+                        SimpleFeedbackCard(
                             message: exportMessage,
-                            systemImage: "square.and.arrow.up",
                             tint: AppTheme.success
                         )
                     }
 
                     sectionTitle("Delete")
-                    actionCard {
-                        SimpleActionButton(
-                            title: "Delete All Data",
-                            systemImage: "trash.fill",
-                            tint: AppTheme.error,
-                            style: .filled,
-                            isEnabled: viewModel.isExporting == false && viewModel.isDeletingAll == false
-                        ) {
+                    SimpleInfoActionCard(
+                        title: "Delete All Data",
+                        subtitle: "Permanently remove hydration entries, goals, and sync data.",
+                        systemImage: "trash.fill",
+                        tint: AppTheme.error,
+                        actionTitle: "Delete All Data",
+                        actionSystemImage: "trash.fill",
+                        actionTint: AppTheme.error,
+                        isActionEnabled: viewModel.isExporting == false && viewModel.isDeletingAll == false,
+                        action: {
                             showDeleteConfirmation = true
                         }
-                    }
+                    )
 
                     if let errorMessage = viewModel.errorMessage {
                         SimpleFormErrorCard(message: errorMessage, tint: AppTheme.error)
 
-                        actionCard {
-                            SimpleActionButton(
-                                title: "Dismiss",
-                                systemImage: "xmark",
-                                tint: AppTheme.muted,
-                                style: .bordered,
-                                isEnabled: true
-                            ) {
+                        SimpleInfoActionCard(
+                            title: "Error",
+                            subtitle: "Dismiss to continue managing data actions.",
+                            systemImage: "xmark.octagon.fill",
+                            tint: AppTheme.muted,
+                            actionTitle: "Dismiss",
+                            actionSystemImage: "xmark",
+                            actionTint: AppTheme.muted,
+                            action: {
                                 viewModel.clearMessages()
                             }
+                        )
                         }
-                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
@@ -148,22 +151,6 @@ internal struct DataManagementView: View {
             .foregroundStyle(AppTheme.muted)
     }
 
-    private func actionCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            content()
-        }
-        .padding(14)
-        .background(cardBackground)
-    }
-
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-            .fill(AppTheme.cardBackground)
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(AppTheme.muted.opacity(0.2), lineWidth: 1)
-            )
-    }
 }
 
 #if DEBUG

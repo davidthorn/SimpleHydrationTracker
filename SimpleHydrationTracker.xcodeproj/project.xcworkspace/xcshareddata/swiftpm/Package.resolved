@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/davidthorn/SimpleFramework.git",
       "state" : {
-        "revision" : "915db1d92b617bd0f20964b69a5e48d1db142fcc",
-        "version" : "0.1.0"
+        "revision" : "86d4940e932b2dcf46919ce26e816bb5063f5318",
+        "version" : "0.2.0"
       }
     }
   ],
