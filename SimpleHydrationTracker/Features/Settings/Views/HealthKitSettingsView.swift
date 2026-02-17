@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SimpleFramework
 import UIKit
 
 internal struct HealthKitSettingsView: View {
@@ -24,17 +25,18 @@ internal struct HealthKitSettingsView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    SettingsHeroCardComponent(
+                    SimpleHeroCard(
                         title: "Health Integration",
                         message: "Choose whether new hydration entries should be written to Apple Health.",
                         systemImage: "heart.text.square.fill",
                         tint: AppTheme.error
                     )
 
-                    HealthKitPermissionsCardComponent(
+                    SimpleHealthKitPermissionsCard(
                         permissionState: viewModel.permissionState,
                         statusSummaryText: viewModel.statusSummaryText,
                         isHealthKitAvailable: viewModel.isHealthKitAvailable,
+                        accentTint: AppTheme.warning,
                         onRequestAccess: {
                             Task {
                                 if Task.isCancelled { return }
@@ -49,7 +51,7 @@ internal struct HealthKitSettingsView: View {
                         }
                     )
 
-                    HealthKitAutoSyncCardComponent(
+                    SimpleHealthKitAutoSyncCard(
                         isAutoSyncEnabled: Binding(
                             get: { viewModel.isAutoSyncEnabled },
                             set: { newValue in
@@ -59,11 +61,12 @@ internal struct HealthKitSettingsView: View {
                                 }
                             }
                         ),
-                        isHealthKitAvailable: viewModel.isHealthKitAvailable
+                        isHealthKitAvailable: viewModel.isHealthKitAvailable,
+                        tint: AppTheme.success
                     )
 
                     if let errorMessage = viewModel.errorMessage {
-                        SettingsStatusCardComponent(
+                        SimpleStatusCard(
                             title: "HealthKit Error",
                             message: errorMessage,
                             systemImage: "exclamationmark.triangle.fill",

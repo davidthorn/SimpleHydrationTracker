@@ -70,6 +70,11 @@ internal struct HistoryView: View {
         .navigationTitle("History")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: TodayRoute.addCustomAmount) {
+                    Label("Add", systemImage: "plus")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink(value: HistoryRoute.historyFilter) {
                     Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
                 }

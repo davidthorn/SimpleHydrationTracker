@@ -35,135 +35,120 @@ internal struct EditTodayEntryView: View {
     }
 
     internal var body: some View {
-        Form {
-            Section {
-                TodayHeroCardComponent(
-                    title: "Edit Entry",
-                    message: "Adjust amount or time, then save your updated log.",
-                    systemImage: "pencil.circle.fill",
-                    tint: AppTheme.warning
-                )
-                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-                .listRowBackground(Color.clear)
-            }
+        ZStack {
+            AppTheme.pageGradient
+                .ignoresSafeArea()
 
-            Section("Amount") {
-                TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.amountText)
-                    .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
-                Text("Unit: \(viewModel.selectedUnit.shortLabel)")
-                    .font(.caption)
-                    .foregroundStyle(AppTheme.muted)
-            }
-
-            Section("When") {
-                DatePicker("Consumed At", selection: $viewModel.consumedAt)
-            }
-
-            if let errorMessage = viewModel.errorMessage {
-                Section {
-                    TodayStatusCardComponent(
-                        title: "Unable to Update Entry",
-                        message: errorMessage,
-                        systemImage: "exclamationmark.triangle.fill",
-                        tint: AppTheme.error
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    SimpleHeroCard(
+                        title: "Edit Entry",
+                        message: "Adjust amount or time, then save your updated log.",
+                        systemImage: "pencil.circle.fill",
+                        tint: AppTheme.warning
                     )
-                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-                    .listRowBackground(Color.clear)
-                }
-            }
 
-            if viewModel.hasPersistedEntry {
-                Section("HealthKit Sync") {
-                    Text(viewModel.syncStatusText)
-                        .font(.footnote)
-                        .foregroundStyle(AppTheme.muted)
+                    amountCard
+                    consumedAtCard
 
-                    if viewModel.syncMetadata == nil {
-                        Button(viewModel.isSyncingToHealthKit ? "Syncing..." : "Sync Entry to HealthKit") {
+                    if let errorMessage = viewModel.errorMessage {
+                        SimpleFormErrorCard(message: errorMessage, tint: AppTheme.error)
+                    }
+
+                    if viewModel.hasPersistedEntry {
+                        healthKitSyncCard
+                    }
+
+                    SimpleFormActionButtons(
+                        showSave: viewModel.canSave,
+                        showReset: viewModel.canReset,
+                        showDelete: viewModel.canDelete,
+                        saveTitle: "Save Entry",
+                        deleteTitle: "Delete Entry",
+                        onSave: {
                             Task {
                                 guard Task.isCancelled == false else {
                                     return
                                 }
-                                await viewModel.syncPersistedEntryToHealthKit()
+
+                                isSaving = true
+                                defer { isSaving = false }
+
+                                do {
+                                    try await viewModel.saveChanges()
+                                } catch {
+                                    guard Task.isCancelled == false else {
+                                        return
+                                    }
+                                }
                             }
+                        },
+                        onReset: {
+                            viewModel.resetChanges()
+                        },
+                        onDelete: {
+                            showDeleteConfirmation = true
                         }
-                        .disabled(viewModel.isSyncingToHealthKit || viewModel.canSyncToHealthKit == false)
-                    }
+                    )
+                    .opacity((isSaving || isDeleting || viewModel.isLoading) ? 0.6 : 1)
+                    .allowsHitTesting(isSaving == false && isDeleting == false && viewModel.isLoading == false)
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
-
-            if viewModel.canReset {
-                Section {
-                    Button("Reset", role: .cancel) {
-                        viewModel.resetChanges()
-                    }
-                }
-            }
-
-            if viewModel.canDelete {
-                Section {
-                    Button("Delete", role: .destructive) {
-                        showDeleteConfirmation = true
-                    }
-                    .disabled(isDeleting)
-                    .accessibilityHint("Permanently deletes this hydration entry.")
-                }
-            }
+            .scrollDismissesKeyboard(.interactively)
         }
         .navigationTitle("Edit Entry")
-        .scrollContentBackground(.hidden)
-        .background(AppTheme.pageGradient)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                if viewModel.canSave {
-                    Button("Save") {
-                        Task {
-                            guard Task.isCancelled == false else {
+        .tint(AppTheme.accent)
+        .overlay {
+            if showDeleteConfirmation {
+                ZStack {
+                    Color.black.opacity(0.16)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            if isDeleting {
                                 return
                             }
+                            showDeleteConfirmation = false
+                        }
 
-                            isSaving = true
-                            defer { isSaving = false }
-
-                            do {
-                                try await viewModel.saveChanges()
-                            } catch {
+                    SimpleDestructiveConfirmationCard(
+                        title: "Delete this entry?",
+                        message: "This entry will be permanently removed from your hydration history.",
+                        confirmTitle: "Delete Entry",
+                        tint: AppTheme.error,
+                        isDisabled: isDeleting,
+                        onCancel: {
+                            showDeleteConfirmation = false
+                        },
+                        onConfirm: {
+                            Task {
                                 guard Task.isCancelled == false else {
                                     return
                                 }
+
+                                isDeleting = true
+                                defer { isDeleting = false }
+
+                                do {
+                                    try await viewModel.deleteEntry()
+                                    guard Task.isCancelled == false else {
+                                        return
+                                    }
+                                    dismiss()
+                                } catch {
+                                    guard Task.isCancelled == false else {
+                                        return
+                                    }
+                                    showDeleteConfirmation = false
+                                }
                             }
                         }
-                    }
-                    .disabled(isSaving)
+                    )
+                    .padding(.horizontal, 16)
                 }
+                .transition(.opacity.combined(with: .scale(scale: 0.98)))
             }
-        }
-        .alert("Delete This Entry?", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) {}
-            Button("Delete", role: .destructive) {
-                Task {
-                    guard Task.isCancelled == false else {
-                        return
-                    }
-
-                    isDeleting = true
-                    defer { isDeleting = false }
-
-                    do {
-                        try await viewModel.deleteEntry()
-                        guard Task.isCancelled == false else {
-                            return
-                        }
-                        dismiss()
-                    } catch {
-                        guard Task.isCancelled == false else {
-                            return
-                        }
-                    }
-                }
-            }
-        } message: {
-            Text("This entry will be permanently removed from your hydration history.")
         }
         .task {
             guard Task.isCancelled == false else {
@@ -177,6 +162,97 @@ internal struct EditTodayEntryView: View {
             }
             await viewModel.refreshSyncStatus()
         }
+        .animation(.easeInOut(duration: 0.2), value: showDeleteConfirmation)
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView("Loading entry...")
+                    .padding(16)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+        }
+    }
+
+    private var amountCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            fieldTitle("Amount")
+            TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.amountText)
+                .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(inputBackground)
+                .disabled(isSaving || isDeleting || viewModel.isLoading)
+
+            Text("Unit: \(viewModel.selectedUnit.shortLabel)")
+                .font(.footnote)
+                .foregroundStyle(AppTheme.muted)
+        }
+        .padding(14)
+        .background(cardBackground)
+    }
+
+    private var consumedAtCard: some View {
+        SimpleDateTimeInputCard(
+            date: $viewModel.consumedAt,
+            title: "Consumed At",
+            subtitle: "Adjust when this hydration entry was consumed.",
+            icon: "calendar.badge.clock",
+            accent: AppTheme.accent
+        )
+        .allowsHitTesting(isSaving == false && isDeleting == false && viewModel.isLoading == false)
+        .opacity((isSaving || isDeleting || viewModel.isLoading) ? 0.6 : 1)
+    }
+
+    private var healthKitSyncCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            fieldTitle("HealthKit Sync")
+            Text(viewModel.syncStatusText)
+                .font(.footnote)
+                .foregroundStyle(AppTheme.muted)
+
+            if viewModel.syncMetadata == nil {
+                SimpleActionButton(
+                    title: viewModel.isSyncingToHealthKit ? "Syncing..." : "Sync Entry to HealthKit",
+                    systemImage: "arrow.triangle.2.circlepath.circle.fill",
+                    tint: AppTheme.success,
+                    style: .filled,
+                    isEnabled: viewModel.isSyncingToHealthKit == false && viewModel.canSyncToHealthKit
+                ) {
+                    Task {
+                        guard Task.isCancelled == false else {
+                            return
+                        }
+                        await viewModel.syncPersistedEntryToHealthKit()
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(cardBackground)
+    }
+
+    private var cardBackground: some View {
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+            .fill(AppTheme.cardBackground)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(AppTheme.muted.opacity(0.2), lineWidth: 1)
+            )
+    }
+
+    private var inputBackground: some View {
+        RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .fill(Color.white.opacity(0.66))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(AppTheme.muted.opacity(0.2), lineWidth: 1)
+            )
+    }
+
+    private func fieldTitle(_ title: String) -> some View {
+        Text(title.uppercased())
+            .font(.caption.weight(.bold))
+            .foregroundStyle(AppTheme.muted)
     }
 }
 

@@ -57,8 +57,17 @@ internal struct AddCustomAmountView: View {
                 .listRowBackground(Color.clear)
             }
 
-            Section("When") {
-                DatePicker("Consumed At", selection: $viewModel.consumedAt)
+            Section {
+                SimpleDateTimeInputCard(
+                    date: $viewModel.consumedAt,
+                    title: "Consumed At",
+                    subtitle: "Adjust when this hydration entry was consumed.",
+                    icon: "calendar.badge.clock",
+                    accent: AppTheme.accent
+                )
+                .allowsHitTesting(isSaving == false)
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                .listRowBackground(Color.clear)
             }
 
             if let errorMessage = viewModel.errorMessage {

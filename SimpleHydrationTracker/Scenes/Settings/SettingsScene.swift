@@ -20,7 +20,7 @@ internal struct SettingsScene: View {
                 .navigationDestination(for: SettingsRoute.self) { route in
                     switch route {
                     case .goalSettings:
-                        GoalSettingsView(serviceContainer: serviceContainer)
+                        GoalSetupView(serviceContainer: serviceContainer)
                     case .reminderSettings:
                         ReminderSettingsView(serviceContainer: serviceContainer)
                     case .notificationPermissions:

@@ -28,14 +28,14 @@ internal struct SettingsView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    SettingsHeroCardComponent(
+                    SimpleHeroCard(
                         title: "Personalize Hydration",
                         message: "Set daily goals, reminders, units, and data controls in one place.",
                         systemImage: "slider.horizontal.3",
                         tint: AppTheme.accent
                     )
 
-                    SettingsRouteSectionComponent(
+                    routeSection(
                         title: "Hydration",
                         rows: [
                             SettingsRow(
@@ -48,7 +48,7 @@ internal struct SettingsView: View {
                         ]
                     )
 
-                    SettingsRouteSectionComponent(
+                    routeSection(
                         title: "Notifications",
                         rows: [
                             SettingsRow(
@@ -68,7 +68,7 @@ internal struct SettingsView: View {
                         ]
                     )
 
-                    SettingsRouteSectionComponent(
+                    routeSection(
                         title: "Preferences",
                         rows: [
                             SettingsRow(
@@ -88,7 +88,7 @@ internal struct SettingsView: View {
                         ]
                     )
 
-                    SettingsRouteSectionComponent(
+                    routeSection(
                         title: "Data",
                         rows: [
                             SettingsRow(
@@ -109,7 +109,7 @@ internal struct SettingsView: View {
                     )
 
                     if let errorMessage = viewModel.errorMessage {
-                        SettingsStatusCardComponent(
+                        SimpleStatusCard(
                             title: "Settings Error",
                             message: errorMessage,
                             systemImage: "exclamationmark.triangle.fill",
@@ -135,24 +135,22 @@ internal struct SettingsView: View {
             }
             await viewModel.start()
         }
-        .alert("Settings Error", isPresented: errorAlertBinding) {
-            Button("OK", role: .cancel) {
-                viewModel.clearError()
-            }
-        } message: {
-            Text(viewModel.errorMessage ?? "")
-        }
     }
 
-    private var errorAlertBinding: Binding<Bool> {
-        Binding(
-            get: { viewModel.errorMessage != nil },
-            set: { isPresented in
-                if isPresented == false {
-                    viewModel.clearError()
+    private func routeSection(title: String, rows: [SettingsRow]) -> some View {
+        SimpleRouteSection(title: title) {
+            ForEach(rows) { row in
+                NavigationLink(value: row.route) {
+                    SimpleRouteRow(
+                        title: row.title,
+                        subtitle: row.subtitle,
+                        systemImage: row.systemImage,
+                        tint: row.tint
+                    )
                 }
+                .buttonStyle(.plain)
             }
-        )
+        }
     }
 }
 

@@ -25,152 +25,112 @@ internal struct ReminderSettingsView: View {
     }
 
     internal var body: some View {
-        Form {
-            Section {
-                SettingsHeroCardComponent(
-                    title: "Reminder Schedule",
-                    message: "Choose reminder windows and cadence for hydration nudges.",
-                    systemImage: "bell.badge",
-                    tint: AppTheme.accent
-                )
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-            }
+        ZStack {
+            AppTheme.pageGradient
+                .ignoresSafeArea()
 
-            Section("Permission") {
-                switch viewModel.authorizationStatus {
-                case .authorized, .provisional:
-                    SettingsStatusCardComponent(
-                        title: "Notifications Enabled",
-                        message: "Reminder alerts can be delivered on this device.",
-                        systemImage: "checkmark.seal.fill",
-                        tint: AppTheme.success
-                    )
-                case .notDetermined:
-                    SettingsStatusCardComponent(
-                        title: "Permission Required",
-                        message: "Request notification permission from the Permissions route.",
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    SimpleHeroCard(
+                        title: "Reminder Schedule",
+                        message: "Choose reminder windows and cadence for hydration nudges.",
                         systemImage: "bell.badge",
-                        tint: AppTheme.warning
+                        tint: AppTheme.accent
                     )
-                case .denied:
-                    SettingsStatusCardComponent(
-                        title: "Permission Denied",
-                        message: "Enable notification access in Permissions to use reminders.",
-                        systemImage: "bell.slash.fill",
-                        tint: AppTheme.error
-                    )
-                }
-            }
 
-            Section("Schedule") {
-                Toggle("Enable Reminders", isOn: $viewModel.isEnabled)
-                    .disabled(viewModel.isLoading || isSaving || isDeleting)
+                    permissionCard
+                    scheduleCard
 
-                if viewModel.isEnabled {
-                    Picker("Start", selection: $viewModel.startHour) {
-                        ForEach(0..<24, id: \.self) { hour in
-                            Text(String(format: "%02d:00", hour)).tag(hour)
-                        }
+                    if let errorMessage = viewModel.errorMessage {
+                        SimpleFormErrorCard(message: errorMessage, tint: AppTheme.error)
                     }
-                    .disabled(viewModel.isLoading || isSaving || isDeleting)
 
-                    Picker("End", selection: $viewModel.endHour) {
-                        ForEach(1..<24, id: \.self) { hour in
-                            Text(String(format: "%02d:00", hour)).tag(hour)
-                        }
-                    }
-                    .disabled(viewModel.isLoading || isSaving || isDeleting)
-
-                    Picker("Interval", selection: $viewModel.intervalMinutes) {
-                        Text("30 min").tag(30)
-                        Text("60 min").tag(60)
-                        Text("90 min").tag(90)
-                        Text("120 min").tag(120)
-                        Text("180 min").tag(180)
-                    }
-                    .disabled(viewModel.isLoading || isSaving || isDeleting)
-                }
-            }
-
-            if let errorMessage = viewModel.errorMessage {
-                Section {
-                    SettingsStatusCardComponent(
-                        title: "Reminder Error",
-                        message: errorMessage,
-                        systemImage: "exclamationmark.triangle.fill",
-                        tint: AppTheme.error
-                    )
-                }
-            }
-
-            if viewModel.canReset {
-                Section {
-                    Button("Reset", role: .cancel) {
-                        viewModel.reset()
-                    }
-                    .disabled(isSaving || isDeleting)
-                }
-            }
-
-            if viewModel.canDelete {
-                Section {
-                    Button("Delete Schedule", role: .destructive) {
-                        showDeleteConfirmation = true
-                    }
-                    .disabled(isDeleting || isSaving)
-                }
-            }
-        }
-        .navigationTitle("Reminders")
-        .scrollContentBackground(.hidden)
-        .background(AppTheme.pageGradient)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                if viewModel.canSave {
-                    Button("Save") {
-                        Task {
-                            guard Task.isCancelled == false else {
-                                return
-                            }
-                            isSaving = true
-                            defer { isSaving = false }
-                            do {
-                                try await viewModel.save()
-                            } catch {
+                    SimpleFormActionButtons(
+                        showSave: viewModel.canSave,
+                        showReset: viewModel.canReset,
+                        showDelete: viewModel.canDelete,
+                        saveTitle: "Save Schedule",
+                        deleteTitle: "Delete Schedule",
+                        onSave: {
+                            Task {
                                 guard Task.isCancelled == false else {
                                     return
                                 }
-                                viewModel.setError("Unable to save reminder settings.")
+                                isSaving = true
+                                defer { isSaving = false }
+                                do {
+                                    try await viewModel.save()
+                                } catch {
+                                    guard Task.isCancelled == false else {
+                                        return
+                                    }
+                                    viewModel.setError("Unable to save reminder settings.")
+                                }
                             }
+                        },
+                        onReset: {
+                            viewModel.reset()
+                        },
+                        onDelete: {
+                            showDeleteConfirmation = true
                         }
-                    }
-                    .disabled(isSaving || isDeleting)
+                    )
+                    .opacity((isSaving || isDeleting || viewModel.isLoading) ? 0.6 : 1)
+                    .allowsHitTesting(isSaving == false && isDeleting == false && viewModel.isLoading == false)
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
         }
-        .alert("Are you sure you want to delete this?", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) {}
-            Button("Delete", role: .destructive) {
-                Task {
-                    guard Task.isCancelled == false else {
-                        return
-                    }
-                    isDeleting = true
-                    defer { isDeleting = false }
-                    do {
-                        try await viewModel.delete()
-                        guard Task.isCancelled == false else {
-                            return
+        .navigationTitle("Reminders")
+        .tint(AppTheme.accent)
+        .overlay {
+            if showDeleteConfirmation {
+                ZStack {
+                    Color.black.opacity(0.16)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            if isDeleting {
+                                return
+                            }
+                            showDeleteConfirmation = false
                         }
-                        dismiss()
-                    } catch {
-                        guard Task.isCancelled == false else {
-                            return
+
+                    SimpleDestructiveConfirmationCard(
+                        title: "Delete this reminder schedule?",
+                        message: "This permanently removes your current reminder cadence.",
+                        confirmTitle: "Delete Schedule",
+                        tint: AppTheme.error,
+                        isDisabled: isDeleting,
+                        onCancel: {
+                            showDeleteConfirmation = false
+                        },
+                        onConfirm: {
+                            Task {
+                                guard Task.isCancelled == false else {
+                                    return
+                                }
+                                isDeleting = true
+                                defer { isDeleting = false }
+                                do {
+                                    try await viewModel.delete()
+                                    guard Task.isCancelled == false else {
+                                        return
+                                    }
+                                    dismiss()
+                                } catch {
+                                    guard Task.isCancelled == false else {
+                                        return
+                                    }
+                                    viewModel.setError("Unable to delete reminder schedule.")
+                                    showDeleteConfirmation = false
+                                }
+                            }
                         }
-                        viewModel.setError("Unable to delete reminder schedule.")
-                    }
+                    )
+                    .padding(.horizontal, 16)
                 }
+                .transition(.opacity.combined(with: .scale(scale: 0.98)))
             }
         }
         .task {
@@ -180,6 +140,7 @@ internal struct ReminderSettingsView: View {
             await viewModel.start()
             await viewModel.refreshPermissionStatus()
         }
+        .animation(.easeInOut(duration: 0.2), value: showDeleteConfirmation)
         .overlay {
             if viewModel.isLoading {
                 ProgressView("Loading reminders...")
@@ -187,6 +148,88 @@ internal struct ReminderSettingsView: View {
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
         }
+    }
+
+    @ViewBuilder
+    private var permissionCard: some View {
+        switch viewModel.authorizationStatus {
+        case .authorized, .provisional:
+            SimpleStatusCard(
+                title: "Notifications Enabled",
+                message: "Reminder alerts can be delivered on this device.",
+                systemImage: "checkmark.seal.fill",
+                tint: AppTheme.success
+            )
+        case .notDetermined:
+            SimpleStatusCard(
+                title: "Permission Required",
+                message: "Request notification permission from the Permissions route.",
+                systemImage: "bell.badge",
+                tint: AppTheme.warning
+            )
+        case .denied:
+            SimpleStatusCard(
+                title: "Permission Denied",
+                message: "Enable notification access in Permissions to use reminders.",
+                systemImage: "bell.slash.fill",
+                tint: AppTheme.error
+            )
+        }
+    }
+
+    private var scheduleCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            fieldTitle("Schedule")
+
+            SimpleToggleCardRow(
+                isOn: $viewModel.isEnabled,
+                title: "Enable Reminders",
+                message: "Allow scheduled hydration nudges.",
+                systemImage: "bell.badge.fill",
+                tint: AppTheme.accent,
+                isEnabled: viewModel.isLoading == false && isSaving == false && isDeleting == false
+            )
+
+            if viewModel.isEnabled {
+                Picker("Start", selection: $viewModel.startHour) {
+                    ForEach(0..<24, id: \.self) { hour in
+                        Text(String(format: "%02d:00", hour)).tag(hour)
+                    }
+                }
+                .disabled(viewModel.isLoading || isSaving || isDeleting)
+
+                Picker("End", selection: $viewModel.endHour) {
+                    ForEach(1..<24, id: \.self) { hour in
+                        Text(String(format: "%02d:00", hour)).tag(hour)
+                    }
+                }
+                .disabled(viewModel.isLoading || isSaving || isDeleting)
+
+                Picker("Interval", selection: $viewModel.intervalMinutes) {
+                    Text("30 min").tag(30)
+                    Text("60 min").tag(60)
+                    Text("90 min").tag(90)
+                    Text("120 min").tag(120)
+                    Text("180 min").tag(180)
+                }
+                .disabled(viewModel.isLoading || isSaving || isDeleting)
+            }
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(AppTheme.cardBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(AppTheme.muted.opacity(0.2), lineWidth: 1)
+                )
+        )
+    }
+
+    private func fieldTitle(_ title: String) -> some View {
+        Text(title.uppercased())
+            .font(.caption.weight(.bold))
+            .foregroundStyle(AppTheme.muted)
     }
 }
 

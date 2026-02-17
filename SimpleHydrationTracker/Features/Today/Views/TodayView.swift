@@ -99,6 +99,13 @@ internal struct TodayView: View {
             }
         }
         .navigationTitle("Today")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(value: TodayRoute.addCustomAmount) {
+                    Label("Add", systemImage: "plus")
+                }
+            }
+        }
         .overlay(alignment: .bottom) {
             if let quickAddSuccessMessage {
                 TodayToastComponent(

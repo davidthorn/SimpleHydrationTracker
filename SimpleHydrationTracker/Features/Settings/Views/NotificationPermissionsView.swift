@@ -18,90 +18,41 @@ internal struct NotificationPermissionsView: View {
     }
 
     internal var body: some View {
-        Form {
-            Section {
-                SettingsHeroCardComponent(
-                    title: "Notification Permissions",
-                    message: "Control how hydration reminders are allowed to notify you.",
-                    systemImage: "lock.shield",
-                    tint: AppTheme.warning
-                )
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-            }
+        ZStack {
+            AppTheme.pageGradient
+                .ignoresSafeArea()
 
-            Section("Status") {
-                switch viewModel.status {
-                case .authorized:
-                    SettingsStatusCardComponent(
-                        title: "Authorized",
-                        message: "Notifications are enabled for this app.",
-                        systemImage: "checkmark.seal.fill",
-                        tint: AppTheme.success
-                    )
-                case .provisional:
-                    SettingsStatusCardComponent(
-                        title: "Provisional Access",
-                        message: "Notifications can be delivered quietly.",
-                        systemImage: "bell.badge",
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    SimpleHeroCard(
+                        title: "Notification Permissions",
+                        message: "Control how hydration reminders are allowed to notify you.",
+                        systemImage: "lock.shield",
                         tint: AppTheme.warning
                     )
-                case .notDetermined:
-                    SettingsStatusCardComponent(
-                        title: "Not Requested",
-                        message: "Request permission to enable reminders.",
-                        systemImage: "questionmark.circle",
-                        tint: AppTheme.warning
-                    )
-                case .denied:
-                    SettingsStatusCardComponent(
-                        title: "Denied",
-                        message: "Open iOS Settings to enable notifications.",
-                        systemImage: "xmark.octagon.fill",
-                        tint: AppTheme.error
-                    )
-                }
-            }
 
-            Section("Actions") {
-                if viewModel.status == .notDetermined {
-                    Button("Request Permission") {
-                        Task {
-                            guard Task.isCancelled == false else {
-                                return
-                            }
-                            await viewModel.requestPermission()
+                    statusCard
+                    actionsCard
+
+                    if let errorMessage = viewModel.errorMessage {
+                        SimpleFormErrorCard(message: errorMessage, tint: AppTheme.error)
+                        SimpleActionButton(
+                            title: "Dismiss",
+                            systemImage: "xmark",
+                            tint: AppTheme.muted,
+                            style: .bordered,
+                            isEnabled: true
+                        ) {
+                            viewModel.clearError()
                         }
                     }
                 }
-
-                if viewModel.status == .denied {
-                    Button("Open Settings") {
-                        guard let url = URL(string: UIApplication.openSettingsURLString) else {
-                            return
-                        }
-                        UIApplication.shared.open(url)
-                    }
-                }
-            }
-
-            if let errorMessage = viewModel.errorMessage {
-                Section {
-                    SettingsStatusCardComponent(
-                        title: "Permission Error",
-                        message: errorMessage,
-                        systemImage: "exclamationmark.triangle.fill",
-                        tint: AppTheme.error
-                    )
-                    Button("Dismiss", role: .cancel) {
-                        viewModel.clearError()
-                    }
-                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
         }
         .navigationTitle("Permissions")
-        .scrollContentBackground(.hidden)
-        .background(AppTheme.pageGradient)
+        .tint(AppTheme.accent)
         .task {
             guard Task.isCancelled == false else {
                 return
@@ -113,6 +64,75 @@ internal struct NotificationPermissionsView: View {
                 ProgressView("Checking permission...")
                     .padding(16)
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var statusCard: some View {
+        switch viewModel.status {
+        case .authorized:
+            SimpleStatusCard(
+                title: "Authorized",
+                message: "Notifications are enabled for this app.",
+                systemImage: "checkmark.seal.fill",
+                tint: AppTheme.success
+            )
+        case .provisional:
+            SimpleStatusCard(
+                title: "Provisional Access",
+                message: "Notifications can be delivered quietly.",
+                systemImage: "bell.badge",
+                tint: AppTheme.warning
+            )
+        case .notDetermined:
+            SimpleStatusCard(
+                title: "Not Requested",
+                message: "Request permission to enable reminders.",
+                systemImage: "questionmark.circle",
+                tint: AppTheme.warning
+            )
+        case .denied:
+            SimpleStatusCard(
+                title: "Denied",
+                message: "Open iOS Settings to enable notifications.",
+                systemImage: "xmark.octagon.fill",
+                tint: AppTheme.error
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var actionsCard: some View {
+        if viewModel.status == .notDetermined {
+            SimpleActionButton(
+                title: "Request Permission",
+                systemImage: "bell.badge.fill",
+                tint: AppTheme.accent,
+                style: .filled,
+                isEnabled: viewModel.isLoading == false
+            ) {
+                Task {
+                    guard Task.isCancelled == false else {
+                        return
+                    }
+                    await viewModel.requestPermission()
+                }
+            }
+        }
+
+        if viewModel.status == .denied {
+            SimpleActionButton(
+                title: "Open Settings",
+                systemImage: "gearshape.fill",
+                tint: AppTheme.warning,
+                style: .filled,
+                isEnabled: true
+            ) {
+                guard let url = URL(string: UIApplication.openSettingsURLString) else {
+                    return
+                }
+                UIApplication.shared.open(url)
             }
         }
     }
