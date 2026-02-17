@@ -7,17 +7,17 @@
 
 import Combine
 import Foundation
-import Models
+import SimpleFramework
 import UIKit
 
 @MainActor
 internal final class HealthKitSettingsViewModel: ObservableObject {
     @Published internal private(set) var isHealthKitAvailable: Bool
-    @Published internal private(set) var permissionState: HealthKitHydrationPermissionState
+    @Published internal private(set) var permissionState: HealthKitPermissionState
     @Published internal private(set) var isAutoSyncEnabled: Bool
     @Published internal private(set) var errorMessage: String?
 
-    private let healthKitHydrationService: HealthKitHydrationServiceProtocol
+    private let healthKitHydrationService: HealthKitQuantitySyncServiceProtocol
 
     internal init(serviceContainer: ServiceContainerProtocol) {
         healthKitHydrationService = serviceContainer.healthKitHydrationService
@@ -49,7 +49,7 @@ internal final class HealthKitSettingsViewModel: ObservableObject {
     }
 
     internal func requestPermissions() async {
-        permissionState = await healthKitHydrationService.requestHydrationPermissions()
+        permissionState = await healthKitHydrationService.requestPermissions()
     }
 
     internal func setAutoSyncEnabled(_ isEnabled: Bool) async {
@@ -57,7 +57,7 @@ internal final class HealthKitSettingsViewModel: ObservableObject {
         isAutoSyncEnabled = isEnabled
 
         if isEnabled && permissionState.write != .authorized {
-            permissionState = await healthKitHydrationService.requestHydrationPermissions()
+            permissionState = await healthKitHydrationService.requestPermissions()
             if permissionState.write != .authorized {
                 errorMessage = "Enable Health permissions to save hydration entries into HealthKit."
             } else {

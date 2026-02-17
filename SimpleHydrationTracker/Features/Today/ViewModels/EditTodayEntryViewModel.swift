@@ -7,7 +7,9 @@
 
 import Combine
 import Foundation
+import HealthKit
 import Models
+import SimpleFramework
 
 @MainActor
 internal final class EditTodayEntryViewModel: ObservableObject {
@@ -43,15 +45,15 @@ internal final class EditTodayEntryViewModel: ObservableObject {
     @Published internal private(set) var errorMessage: String?
     @Published internal private(set) var isLoading: Bool
     @Published internal private(set) var selectedUnit: SettingsVolumeUnit
-    @Published internal private(set) var syncMetadata: HydrationEntrySyncMetadata?
-    @Published internal private(set) var healthKitPermissionState: HealthKitHydrationPermissionState
+    @Published internal private(set) var syncMetadata: HealthKitEntrySyncMetadata?
+    @Published internal private(set) var healthKitPermissionState: HealthKitPermissionState
     @Published internal private(set) var isSyncingToHealthKit: Bool
 
     private let entryID: HydrationEntryIdentifier
     private let hydrationService: HydrationServiceProtocol
     private let unitsPreferenceService: UnitsPreferenceServiceProtocol
-    private let healthKitHydrationService: HealthKitHydrationServiceProtocol
-    private let hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
+    private let healthKitHydrationService: HealthKitQuantitySyncServiceProtocol
+    private let hydrationEntrySyncMetadataService: HealthKitEntrySyncMetadataServiceProtocol
     private var originalEntry: HydrationEntry?
     private var hasLoaded: Bool
     private var unitsObservationTask: Task<Void, Never>?
@@ -60,8 +62,8 @@ internal final class EditTodayEntryViewModel: ObservableObject {
         entryID: HydrationEntryIdentifier,
         hydrationService: HydrationServiceProtocol,
         unitsPreferenceService: UnitsPreferenceServiceProtocol,
-        healthKitHydrationService: HealthKitHydrationServiceProtocol,
-        hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
+        healthKitHydrationService: HealthKitQuantitySyncServiceProtocol,
+        hydrationEntrySyncMetadataService: HealthKitEntrySyncMetadataServiceProtocol
     ) {
         self.entryID = entryID
         self.hydrationService = hydrationService
@@ -163,7 +165,7 @@ internal final class EditTodayEntryViewModel: ObservableObject {
             amountText = selectedUnit.editableAmountText(milliliters: entry.amountMilliliters)
             consumedAt = entry.consumedAt
             syncMetadata = try await hydrationEntrySyncMetadataService.fetchMetadata(
-                for: entryID,
+                for: entryID.value,
                 providerIdentifier: healthKitHydrationService.providerIdentifier
             )
             errorMessage = nil
@@ -196,7 +198,7 @@ internal final class EditTodayEntryViewModel: ObservableObject {
         do {
             try await hydrationService.upsertEntry(updatedEntry)
             if shouldInvalidateSyncMetadata {
-                try await hydrationEntrySyncMetadataService.deleteMetadata(for: entryID)
+                try await hydrationEntrySyncMetadataService.deleteMetadata(for: entryID.value)
                 syncMetadata = nil
             }
             self.originalEntry = updatedEntry
@@ -224,7 +226,7 @@ internal final class EditTodayEntryViewModel: ObservableObject {
 
         do {
             try await hydrationService.deleteEntry(id: entryID)
-            try await hydrationEntrySyncMetadataService.deleteMetadata(for: entryID)
+            try await hydrationEntrySyncMetadataService.deleteMetadata(for: entryID.value)
             originalEntry = nil
             syncMetadata = nil
             errorMessage = nil
@@ -244,7 +246,7 @@ internal final class EditTodayEntryViewModel: ObservableObject {
 
         do {
             syncMetadata = try await hydrationEntrySyncMetadataService.fetchMetadata(
-                for: entryID,
+                for: entryID.value,
                 providerIdentifier: healthKitHydrationService.providerIdentifier
             )
         } catch {
@@ -259,8 +261,13 @@ internal final class EditTodayEntryViewModel: ObservableObject {
         defer { isSyncingToHealthKit = false }
 
         do {
-            let externalIdentifier = try await healthKitHydrationService.syncEntry(entry)
-            let metadata = HydrationEntrySyncMetadata(
+            let externalIdentifier = try await healthKitHydrationService.syncSample(
+                value: Double(entry.amountMilliliters),
+                unit: .literUnit(with: .milli),
+                start: entry.consumedAt,
+                end: entry.consumedAt
+            )
+            let metadata = HealthKitEntrySyncMetadata(
                 entryID: entryID.value,
                 providerIdentifier: healthKitHydrationService.providerIdentifier,
                 externalIdentifier: externalIdentifier,

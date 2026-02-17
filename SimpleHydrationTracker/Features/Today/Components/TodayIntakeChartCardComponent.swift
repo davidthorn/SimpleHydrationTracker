@@ -6,6 +6,7 @@
 //
 
 import Charts
+import SimpleFramework
 import SwiftUI
 
 internal struct TodayIntakeChartCardComponent: View {

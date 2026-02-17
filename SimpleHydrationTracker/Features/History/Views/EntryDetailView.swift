@@ -8,6 +8,7 @@
 import Foundation
 import Models
 import SwiftUI
+import SimpleFramework
 
 internal struct EntryDetailView: View {
     @Environment(\.dismiss) private var dismiss

@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import Models
+import SimpleFramework
 
 @MainActor
 internal final class DataManagementViewModel: ObservableObject {
@@ -18,14 +19,14 @@ internal final class DataManagementViewModel: ObservableObject {
 
     private let hydrationService: HydrationServiceProtocol
     private let goalService: GoalServiceProtocol
-    private let healthKitHydrationService: HealthKitHydrationServiceProtocol
-    private let hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
+    private let healthKitHydrationService: HealthKitQuantitySyncServiceProtocol
+    private let hydrationEntrySyncMetadataService: HealthKitEntrySyncMetadataServiceProtocol
 
     internal init(
         hydrationService: HydrationServiceProtocol,
         goalService: GoalServiceProtocol,
-        healthKitHydrationService: HealthKitHydrationServiceProtocol,
-        hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
+        healthKitHydrationService: HealthKitQuantitySyncServiceProtocol,
+        hydrationEntrySyncMetadataService: HealthKitEntrySyncMetadataServiceProtocol
     ) {
         self.hydrationService = hydrationService
         self.goalService = goalService

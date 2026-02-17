@@ -12,6 +12,7 @@
 		4439FE822F41BA20003DB03B /* Models.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4439FE7B2F41BA20003DB03B /* Models.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4439FE882F41BA36003DB03B /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4439FE7B2F41BA20003DB03B /* Models.framework */; };
 		4439FE892F41BA36003DB03B /* Models.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4439FE7B2F41BA20003DB03B /* Models.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		447E53602F449AEA001CD834 /* SimpleFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 447E535F2F449AEA001CD834 /* SimpleFramework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,6 +105,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4439FE812F41BA20003DB03B /* Models.framework in Frameworks */,
+				447E53602F449AEA001CD834 /* SimpleFramework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,6 +189,7 @@
 			);
 			name = SimpleHydrationTracker;
 			packageProductDependencies = (
+				447E535F2F449AEA001CD834 /* SimpleFramework */,
 			);
 			productName = SimpleHydrationTracker;
 			productReference = 4439FE532F41B973003DB03B /* SimpleHydrationTracker.app */;
@@ -269,6 +272,9 @@
 			);
 			mainGroup = 4439FE4A2F41B973003DB03B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				447E535E2F449AEA001CD834 /* XCLocalSwiftPackageReference "../SimpleFramework" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4439FE542F41B973003DB03B /* Products */;
 			projectDirPath = "";
@@ -764,6 +770,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		447E535E2F449AEA001CD834 /* XCLocalSwiftPackageReference "../SimpleFramework" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../SimpleFramework;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		447E535F2F449AEA001CD834 /* SimpleFramework */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SimpleFramework;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4439FE4B2F41B973003DB03B /* Project object */;
 }

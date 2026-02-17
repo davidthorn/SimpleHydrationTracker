@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SimpleFramework
 
 internal struct HistorySummaryCardComponent: View {
     internal let date: Date

@@ -7,7 +7,9 @@
 
 #if DEBUG
     import Foundation
+    import HealthKit
     import Models
+    import SimpleFramework
 
     internal struct PreviewServiceContainer: ServiceContainerProtocol {
         internal let hydrationService: HydrationServiceProtocol
@@ -16,28 +18,19 @@
         internal let unitsPreferenceService: UnitsPreferenceServiceProtocol
         internal let sipSizePreferenceService: SipSizePreferenceServiceProtocol
         internal let historyFilterPreferenceService: HistoryFilterPreferenceServiceProtocol
-        internal let healthKitHydrationService: HealthKitHydrationServiceProtocol
-        internal let hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
+        internal let healthKitHydrationService: HealthKitQuantitySyncServiceProtocol
+        internal let hydrationEntrySyncMetadataService: HealthKitEntrySyncMetadataServiceProtocol
 
         internal init() {
-            let previewFilePathResolver = StoreFilePathResolver()
-            let previewCodec = StoreJSONCodec()
-
-            let previewHydrationStore = HydrationStore(
+            let previewHydrationStore = JSONEntityStore<HydrationEntry>(
                 fileName: "preview_hydration_entries.json",
-                filePathResolver: previewFilePathResolver,
-                codec: previewCodec
+                sort: { lhs, rhs in
+                    lhs.consumedAt < rhs.consumedAt
+                }
             )
-            let previewGoalStore = GoalStore(
-                fileName: "preview_hydration_goal.json",
-                filePathResolver: previewFilePathResolver,
-                codec: previewCodec
-            )
-            let previewSyncMetadataStore = HydrationEntrySyncMetadataStore(
-                fileName: "preview_hydration_entry_sync_metadata.json",
-                filePathResolver: previewFilePathResolver,
-                codec: previewCodec
-            )
+            let previewGoalStore = JSONValueStore<HydrationGoal>(fileName: "preview_hydration_goal.json")
+            let previewSyncMetadataStore = HealthKitEntrySyncMetadataStore(fileName: "preview_hydration_entry_sync_metadata.json")
+            let previewHealthKitQuantityService = HealthKitQuantityService()
 
             hydrationService = HydrationService(hydrationStore: previewHydrationStore)
             goalService = GoalService(goalStore: previewGoalStore)
@@ -45,8 +38,15 @@
             unitsPreferenceService = PreviewUnitsPreferenceService()
             sipSizePreferenceService = PreviewSipSizePreferenceService()
             historyFilterPreferenceService = PreviewHistoryFilterPreferenceService()
-            healthKitHydrationService = HealthKitHydrationService(autoSyncKey: "preview_hydration_healthkit_auto_sync_enabled")
-            hydrationEntrySyncMetadataService = HydrationEntrySyncMetadataService(store: previewSyncMetadataStore)
+            healthKitHydrationService = HealthKitQuantitySyncService(
+                descriptor: HealthKitQuantitySyncDescriptor(
+                    quantityIdentifier: .dietaryWater,
+                    providerIdentifier: "healthkit.dietaryWater",
+                    autoSyncKey: "preview_hydration_healthkit_auto_sync_enabled"
+                ),
+                quantityService: previewHealthKitQuantityService
+            )
+            hydrationEntrySyncMetadataService = HealthKitEntrySyncMetadataService(store: previewSyncMetadataStore)
         }
     }
 

@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import Models
+import SimpleFramework
 
 @main
 internal struct SimpleHydrationTrackerApp: App {
@@ -16,8 +18,13 @@ internal struct SimpleHydrationTrackerApp: App {
     private let serviceContainer: ServiceContainerProtocol
 
     internal init() {
-        let hydrationStore = HydrationStore()
-        let goalStore = GoalStore()
+        let hydrationStore = JSONEntityStore<HydrationEntry>(
+            fileName: "hydration_entries.json",
+            sort: { lhs, rhs in
+                lhs.consumedAt < rhs.consumedAt
+            }
+        )
+        let goalStore = JSONValueStore<HydrationGoal>(fileName: "hydration_goal.json")
 
         let serviceContainer = ServiceContainer(
             hydrationStore: hydrationStore,

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SimpleFramework
 
 internal struct TodayProgressCardView: View {
     private let consumedMilliliters: Int

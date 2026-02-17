@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SimpleFramework
 import UIKit
 
 internal struct NotificationPermissionsView: View {

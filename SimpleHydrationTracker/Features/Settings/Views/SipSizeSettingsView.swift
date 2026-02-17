@@ -7,6 +7,7 @@
 
 import Models
 import SwiftUI
+import SimpleFramework
 
 internal struct SipSizeSettingsView: View {
     @Environment(\.dismiss) private var dismiss

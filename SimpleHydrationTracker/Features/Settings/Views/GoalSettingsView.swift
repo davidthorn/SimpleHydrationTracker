@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SimpleFramework
 
 internal struct GoalSettingsView: View {
     @Environment(\.dismiss) private var dismiss

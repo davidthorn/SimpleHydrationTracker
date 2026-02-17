@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import SimpleFramework
 
 @MainActor
 internal final class NotificationPermissionsViewModel: ObservableObject {

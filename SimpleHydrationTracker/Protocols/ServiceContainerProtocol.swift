@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SimpleFramework
 
 internal protocol ServiceContainerProtocol: Sendable {
     var hydrationService: HydrationServiceProtocol { get }
@@ -14,6 +15,6 @@ internal protocol ServiceContainerProtocol: Sendable {
     var unitsPreferenceService: UnitsPreferenceServiceProtocol { get }
     var sipSizePreferenceService: SipSizePreferenceServiceProtocol { get }
     var historyFilterPreferenceService: HistoryFilterPreferenceServiceProtocol { get }
-    var healthKitHydrationService: HealthKitHydrationServiceProtocol { get }
-    var hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol { get }
+    var healthKitHydrationService: HealthKitQuantitySyncServiceProtocol { get }
+    var hydrationEntrySyncMetadataService: HealthKitEntrySyncMetadataServiceProtocol { get }
 }

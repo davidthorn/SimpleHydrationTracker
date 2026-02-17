@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import Models
+import SimpleFramework
 
 @MainActor
 internal final class SettingsViewModel: ObservableObject {
@@ -15,11 +16,11 @@ internal final class SettingsViewModel: ObservableObject {
     @Published internal private(set) var isLoading: Bool
     @Published internal private(set) var selectedUnit: SettingsVolumeUnit
     @Published internal private(set) var sipSize: SipSizeOption
-    @Published internal private(set) var healthKitPermissionState: HealthKitHydrationPermissionState
+    @Published internal private(set) var healthKitPermissionState: HealthKitPermissionState
 
     private let unitsPreferenceService: UnitsPreferenceServiceProtocol
     private let sipSizePreferenceService: SipSizePreferenceServiceProtocol
-    private let healthKitHydrationService: HealthKitHydrationServiceProtocol
+    private let healthKitHydrationService: HealthKitQuantitySyncServiceProtocol
     private var hasLoaded: Bool
     private var unitsObservationTask: Task<Void, Never>?
     private var sipSizeObservationTask: Task<Void, Never>?
@@ -27,7 +28,7 @@ internal final class SettingsViewModel: ObservableObject {
     internal init(
         unitsPreferenceService: UnitsPreferenceServiceProtocol,
         sipSizePreferenceService: SipSizePreferenceServiceProtocol,
-        healthKitHydrationService: HealthKitHydrationServiceProtocol
+        healthKitHydrationService: HealthKitQuantitySyncServiceProtocol
     ) {
         self.unitsPreferenceService = unitsPreferenceService
         self.sipSizePreferenceService = sipSizePreferenceService

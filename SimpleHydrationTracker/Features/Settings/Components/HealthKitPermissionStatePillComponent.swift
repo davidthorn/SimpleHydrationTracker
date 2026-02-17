@@ -5,7 +5,7 @@
 //  Created by David Thorn on 16.02.2026.
 //
 
-import Models
+import SimpleFramework
 import SwiftUI
 
 internal struct HealthKitPermissionStatePillComponent: View {

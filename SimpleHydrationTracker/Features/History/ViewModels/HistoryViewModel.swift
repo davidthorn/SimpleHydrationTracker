@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import Models
+import SimpleFramework
 
 @MainActor
 internal final class HistoryViewModel: ObservableObject {

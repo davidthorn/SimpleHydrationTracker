@@ -2,7 +2,7 @@
 //  HydrationStoreProtocol.swift
 //  SimpleHydrationTracker
 //
-//  Created by David Thorn on 15.02.2026.
+//  Created by David Thorn on 17.02.2026.
 //
 
 import Foundation

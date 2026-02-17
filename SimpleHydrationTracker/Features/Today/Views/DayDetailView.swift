@@ -8,6 +8,7 @@
 import Foundation
 import Models
 import SwiftUI
+import SimpleFramework
 
 internal struct DayDetailView: View {
     @StateObject private var viewModel: DayDetailViewModel

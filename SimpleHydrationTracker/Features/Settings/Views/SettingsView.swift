@@ -7,6 +7,7 @@
 
 import Models
 import SwiftUI
+import SimpleFramework
 
 internal struct SettingsView: View {
     @StateObject private var viewModel: SettingsViewModel

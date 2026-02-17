@@ -7,7 +7,9 @@
 
 import Combine
 import Foundation
+import HealthKit
 import Models
+import SimpleFramework
 
 @MainActor
 internal final class AddCustomAmountViewModel: ObservableObject {
@@ -20,8 +22,8 @@ internal final class AddCustomAmountViewModel: ObservableObject {
     private let hydrationService: HydrationServiceProtocol
     private let unitsPreferenceService: UnitsPreferenceServiceProtocol
     private let sipSizePreferenceService: SipSizePreferenceServiceProtocol
-    private let healthKitHydrationService: HealthKitHydrationServiceProtocol
-    private let hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol
+    private let healthKitHydrationService: HealthKitQuantitySyncServiceProtocol
+    private let hydrationEntrySyncMetadataService: HealthKitEntrySyncMetadataServiceProtocol
     private let nowProvider: () -> Date
     private var hasStarted: Bool
     private var unitsObservationTask: Task<Void, Never>?
@@ -31,8 +33,8 @@ internal final class AddCustomAmountViewModel: ObservableObject {
         hydrationService: HydrationServiceProtocol,
         unitsPreferenceService: UnitsPreferenceServiceProtocol,
         sipSizePreferenceService: SipSizePreferenceServiceProtocol,
-        healthKitHydrationService: HealthKitHydrationServiceProtocol,
-        hydrationEntrySyncMetadataService: HydrationEntrySyncMetadataServiceProtocol,
+        healthKitHydrationService: HealthKitQuantitySyncServiceProtocol,
+        hydrationEntrySyncMetadataService: HealthKitEntrySyncMetadataServiceProtocol,
         nowProvider: @escaping () -> Date = { Date() }
     ) {
         self.hydrationService = hydrationService
@@ -85,9 +87,14 @@ internal final class AddCustomAmountViewModel: ObservableObject {
         )
 
         try await hydrationService.upsertEntry(entry)
-        let externalIdentifier = try await healthKitHydrationService.syncEntryIfEnabled(entry)
+        let externalIdentifier = try await healthKitHydrationService.syncSampleIfEnabled(
+            value: Double(entry.amountMilliliters),
+            unit: .literUnit(with: .milli),
+            start: entry.consumedAt,
+            end: entry.consumedAt
+        )
         if let externalIdentifier {
-            let metadata = HydrationEntrySyncMetadata(
+            let metadata = HealthKitEntrySyncMetadata(
                 entryID: entry.id,
                 providerIdentifier: healthKitHydrationService.providerIdentifier,
                 externalIdentifier: externalIdentifier,

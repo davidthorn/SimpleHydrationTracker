@@ -5,18 +5,18 @@
 //  Created by David Thorn on 16.02.2026.
 //
 
-import Models
+import SimpleFramework
 import SwiftUI
 
 internal struct HealthKitPermissionsCardComponent: View {
-    private let permissionState: HealthKitHydrationPermissionState
+    private let permissionState: HealthKitPermissionState
     private let statusSummaryText: String
     private let isHealthKitAvailable: Bool
     private let onRequestAccess: () -> Void
     private let onOpenSettings: () -> Void
 
     internal init(
-        permissionState: HealthKitHydrationPermissionState,
+        permissionState: HealthKitPermissionState,
         statusSummaryText: String,
         isHealthKitAvailable: Bool,
         onRequestAccess: @escaping () -> Void,
@@ -90,7 +90,7 @@ internal struct HealthKitPermissionsCardComponent: View {
 #if DEBUG
     #Preview {
         HealthKitPermissionsCardComponent(
-            permissionState: HealthKitHydrationPermissionState(read: .authorized, write: .denied),
+            permissionState: HealthKitPermissionState(read: .authorized, write: .denied),
             statusSummaryText: "Read is authorized, write is denied.",
             isHealthKitAvailable: true,
             onRequestAccess: {},

@@ -6,6 +6,7 @@
 //
 
 import Models
+import SimpleFramework
 import SwiftUI
 
 internal struct HistoryEntryRowComponent: View {
