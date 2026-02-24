@@ -115,7 +115,7 @@ internal struct EditTodayEntryView: View {
                     SimpleDestructiveConfirmationCard(
                         title: "Delete this entry?",
                         message: "This entry will be permanently removed from your hydration history.",
-                        confirmTitle: "Delete Entry",
+                        confirmTitle: "Confirm",
                         tint: AppTheme.error,
                         isDisabled: isDeleting,
                         onCancel: {
@@ -173,21 +173,15 @@ internal struct EditTodayEntryView: View {
     }
 
     private var amountCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            fieldTitle("Amount")
-            TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.amountText)
-                .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(inputBackground)
-                .disabled(isSaving || isDeleting || viewModel.isLoading)
-
-            Text("Unit: \(viewModel.selectedUnit.shortLabel)")
-                .font(.footnote)
-                .foregroundStyle(AppTheme.muted)
-        }
-        .padding(14)
-        .background(cardBackground)
+        SimpleLabeledTextFieldCard(
+            numericText: $viewModel.amountText,
+            title: "Amount",
+            placeholder: viewModel.selectedUnit.settingsValueLabel,
+            helperText: "Unit: \(viewModel.selectedUnit.shortLabel)",
+            tint: AppTheme.warning,
+            isEnabled: isSaving == false && isDeleting == false && viewModel.isLoading == false,
+            allowsDecimalInput: viewModel.selectedUnit == .ounces
+        )
     }
 
     private var consumedAtCard: some View {
@@ -196,7 +190,8 @@ internal struct EditTodayEntryView: View {
             title: "Consumed At",
             subtitle: "Adjust when this hydration entry was consumed.",
             icon: "calendar.badge.clock",
-            accent: AppTheme.accent
+            accent: AppTheme.accent,
+            presentationStyle: .inline
         )
         .allowsHitTesting(isSaving == false && isDeleting == false && viewModel.isLoading == false)
         .opacity((isSaving || isDeleting || viewModel.isLoading) ? 0.6 : 1)
@@ -204,7 +199,7 @@ internal struct EditTodayEntryView: View {
 
     private var healthKitSyncCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            fieldTitle("HealthKit Sync")
+            SimpleSectionTitleLabel(title: "HealthKit Sync", tint: AppTheme.muted)
             Text(viewModel.syncStatusText)
                 .font(.footnote)
                 .foregroundStyle(AppTheme.muted)
@@ -238,21 +233,6 @@ internal struct EditTodayEntryView: View {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .stroke(AppTheme.muted.opacity(0.2), lineWidth: 1)
             )
-    }
-
-    private var inputBackground: some View {
-        RoundedRectangle(cornerRadius: 10, style: .continuous)
-            .fill(Color.white.opacity(0.66))
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(AppTheme.muted.opacity(0.2), lineWidth: 1)
-            )
-    }
-
-    private func fieldTitle(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.caption.weight(.bold))
-            .foregroundStyle(AppTheme.muted)
     }
 }
 

@@ -139,36 +139,20 @@ internal struct SipSizeSettingsView: View {
 
     private var sipAmountCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            fieldTitle("Sip Amount")
+            SimpleSectionTitleLabel(title: "Sip Amount", tint: AppTheme.muted)
             ForEach(SipSizeOption.allCases) { sipSize in
-                Button {
-                    viewModel.selectedSipSize = sipSize
-                } label: {
-                    HStack(alignment: .center, spacing: 10) {
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(viewModel.selectedUnit.format(milliliters: sipSize.milliliters))
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.primary)
-                            Text(sipSize.recommendationLabel)
-                                .font(.caption)
-                                .foregroundStyle(AppTheme.muted)
-                        }
-
-                        Spacer(minLength: 8)
-
-                        if viewModel.selectedSipSize == sipSize {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(AppTheme.accent)
-                        }
+                SimpleSelectableCardRow(
+                    title: viewModel.selectedUnit.format(milliliters: sipSize.milliliters),
+                    subtitle: sipSize.recommendationLabel,
+                    systemImage: "drop.fill",
+                    tint: AppTheme.accent,
+                    isSelected: viewModel.selectedSipSize == sipSize,
+                    onToggleSelection: {
+                        viewModel.selectedSipSize = sipSize
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .background(optionBackground(isSelected: viewModel.selectedSipSize == sipSize))
-                }
-                .buttonStyle(.plain)
-                .disabled(viewModel.isLoading || isSaving || isDeleting)
+                )
+                .allowsHitTesting(viewModel.isLoading == false && isSaving == false && isDeleting == false)
+                .opacity(viewModel.isLoading || isSaving || isDeleting ? 0.6 : 1)
             }
         }
         .padding(14)
@@ -177,7 +161,7 @@ internal struct SipSizeSettingsView: View {
 
     private var quickAddPreviewCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            fieldTitle("Quick Add Preview")
+            SimpleSectionTitleLabel(title: "Quick Add Preview", tint: AppTheme.muted)
             Text("Small quick adds begin at \(viewModel.selectedUnit.format(milliliters: viewModel.selectedSipSize.milliliters)) and scale up by sip multiples.")
                 .font(.subheadline)
                 .foregroundStyle(AppTheme.muted)
@@ -195,20 +179,6 @@ internal struct SipSizeSettingsView: View {
             )
     }
 
-    private func optionBackground(isSelected: Bool) -> some View {
-        RoundedRectangle(cornerRadius: 10, style: .continuous)
-            .fill(isSelected ? AppTheme.accent.opacity(0.14) : Color.white.opacity(0.66))
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(isSelected ? AppTheme.accent.opacity(0.4) : AppTheme.muted.opacity(0.2), lineWidth: 1)
-            )
-    }
-
-    private func fieldTitle(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.caption.weight(.bold))
-            .foregroundStyle(AppTheme.muted)
-    }
 }
 
 #if DEBUG

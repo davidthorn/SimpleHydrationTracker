@@ -53,8 +53,7 @@ internal struct HistoryFilterView: View {
             }
 
             Section("Sources") {
-                Toggle(
-                    "Quick Add",
+                SimpleToggleCardRow(
                     isOn: Binding(
                         get: { viewModel.includeQuickAdd },
                         set: { isOn in
@@ -65,10 +64,16 @@ internal struct HistoryFilterView: View {
                                 await viewModel.updateIncludeQuickAdd(isOn)
                             }
                         }
-                    )
+                    ),
+                    title: "Quick Add",
+                    message: "Include quick-add hydration entries.",
+                    systemImage: "bolt.fill",
+                    tint: AppTheme.accent
                 )
-                Toggle(
-                    "Custom Amount",
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+
+                SimpleToggleCardRow(
                     isOn: Binding(
                         get: { viewModel.includeCustomAmount },
                         set: { isOn in
@@ -79,10 +84,16 @@ internal struct HistoryFilterView: View {
                                 await viewModel.updateIncludeCustomAmount(isOn)
                             }
                         }
-                    )
+                    ),
+                    title: "Custom Amount",
+                    message: "Include custom logged hydration entries.",
+                    systemImage: "plus.circle.fill",
+                    tint: AppTheme.success
                 )
-                Toggle(
-                    "Edited",
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+
+                SimpleToggleCardRow(
                     isOn: Binding(
                         get: { viewModel.includeEdited },
                         set: { isOn in
@@ -93,8 +104,14 @@ internal struct HistoryFilterView: View {
                                 await viewModel.updateIncludeEdited(isOn)
                             }
                         }
-                    )
+                    ),
+                    title: "Edited",
+                    message: "Include entries that were edited after creation.",
+                    systemImage: "pencil.circle.fill",
+                    tint: AppTheme.warning
                 )
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
             }
 
             if viewModel.hasChanges {

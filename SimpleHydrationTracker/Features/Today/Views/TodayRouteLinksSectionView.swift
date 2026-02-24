@@ -6,6 +6,7 @@
 //
 
 import Models
+import SimpleFramework
 import SwiftUI
 
 internal struct TodayRouteLinksSectionView: View {
@@ -28,7 +29,7 @@ internal struct TodayRouteLinksSectionView: View {
             }
 
             NavigationLink(value: TodayRoute.addCustomAmount) {
-                TodayRouteRowComponent(
+                SimpleRouteRow(
                     title: "Add Custom Amount",
                     subtitle: "Log a specific intake",
                     systemImage: "plus.circle",
@@ -40,7 +41,7 @@ internal struct TodayRouteLinksSectionView: View {
 
             if let latestEntryID {
                 NavigationLink(value: TodayRoute.editTodayEntry(entryID: latestEntryID)) {
-                    TodayRouteRowComponent(
+                    SimpleRouteRow(
                         title: "Edit Latest Entry",
                         subtitle: "Update your most recent log",
                         systemImage: "pencil",
@@ -50,7 +51,7 @@ internal struct TodayRouteLinksSectionView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("today.route.editLatestEntry")
             } else {
-                TodayRouteRowComponent(
+                SimpleRouteRow(
                     title: "Edit Latest Entry",
                     subtitle: "Add water first to enable editing",
                     systemImage: "pencil",
@@ -61,7 +62,7 @@ internal struct TodayRouteLinksSectionView: View {
             }
 
             NavigationLink(value: TodayRoute.dayDetail(dayID: currentDayID)) {
-                TodayRouteRowComponent(
+                SimpleRouteRow(
                     title: "Day Detail",
                     subtitle: "Review today's timeline",
                     systemImage: "calendar",
@@ -72,7 +73,7 @@ internal struct TodayRouteLinksSectionView: View {
             .accessibilityIdentifier("today.route.dayDetail")
 
             NavigationLink(value: TodayRoute.goalSetup) {
-                TodayRouteRowComponent(
+                SimpleRouteRow(
                     title: "Goal Setup",
                     subtitle: "Set your daily hydration target",
                     systemImage: "target",

@@ -32,7 +32,7 @@ internal struct DayDetailView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    TodayHeroCardComponent(
+                    SimpleHeroCard(
                         title: "Day Detail",
                         message: "Review every logged entry for this day.",
                         systemImage: "calendar.circle.fill",

@@ -34,7 +34,7 @@ internal struct TodayView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    TodayHeroCardComponent(
+                    SimpleHeroCard(
                         title: "Today at a Glance",
                         message: "Track progress, log quickly, and manage your current day from one flow.",
                         systemImage: "drop.circle.fill",
@@ -108,7 +108,7 @@ internal struct TodayView: View {
         }
         .overlay(alignment: .bottom) {
             if let quickAddSuccessMessage {
-                TodayToastComponent(
+                SimpleToastCard(
                     message: quickAddSuccessMessage,
                     systemImage: "checkmark.circle.fill",
                     tint: AppTheme.success

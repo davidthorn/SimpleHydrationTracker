@@ -154,45 +154,15 @@ internal struct GoalSetupView: View {
     }
 
     private var goalFormCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            fieldTitle("Daily Goal")
-            TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.goalText)
-                .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(inputBackground)
-                .disabled(isSaving || isDeleting || viewModel.isLoading)
-
-            Text("Unit: \(viewModel.selectedUnit.shortLabel)")
-                .font(.footnote)
-                .foregroundStyle(AppTheme.muted)
-        }
-        .padding(14)
-        .background(cardBackground)
-    }
-
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-            .fill(AppTheme.cardBackground)
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(AppTheme.muted.opacity(0.2), lineWidth: 1)
-            )
-    }
-
-    private var inputBackground: some View {
-        RoundedRectangle(cornerRadius: 10, style: .continuous)
-            .fill(Color.white.opacity(0.66))
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(AppTheme.muted.opacity(0.2), lineWidth: 1)
-            )
-    }
-
-    private func fieldTitle(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.caption.weight(.bold))
-            .foregroundStyle(AppTheme.muted)
+        SimpleLabeledTextFieldCard(
+            numericText: $viewModel.goalText,
+            title: "Daily Goal",
+            placeholder: viewModel.selectedUnit.settingsValueLabel,
+            helperText: "Unit: \(viewModel.selectedUnit.shortLabel)",
+            tint: AppTheme.accent,
+            isEnabled: isSaving == false && isDeleting == false && viewModel.isLoading == false,
+            allowsDecimalInput: viewModel.selectedUnit == .ounces
+        )
     }
 }
 

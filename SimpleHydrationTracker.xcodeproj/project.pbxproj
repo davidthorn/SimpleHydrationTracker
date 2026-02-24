@@ -12,7 +12,8 @@
 		4439FE822F41BA20003DB03B /* Models.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4439FE7B2F41BA20003DB03B /* Models.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4439FE882F41BA36003DB03B /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4439FE7B2F41BA20003DB03B /* Models.framework */; };
 		4439FE892F41BA36003DB03B /* Models.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4439FE7B2F41BA20003DB03B /* Models.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		44650CF12F44BE65004FE0CF /* SimpleFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 44650CF02F44BE65004FE0CF /* SimpleFramework */; };
+		44CEEC812F4D99CA000D5182 /* SimpleFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 44CEEC802F4D99CA000D5182 /* SimpleFramework */; };
+		44E5E0CB2F4DB3330085E706 /* SimpleFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 44E5E0CA2F4DB3330085E706 /* SimpleFramework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,7 +106,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				4439FE812F41BA20003DB03B /* Models.framework in Frameworks */,
-				44650CF12F44BE65004FE0CF /* SimpleFramework in Frameworks */,
+				44E5E0CB2F4DB3330085E706 /* SimpleFramework in Frameworks */,
+				44CEEC812F4D99CA000D5182 /* SimpleFramework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,7 +191,8 @@
 			);
 			name = SimpleHydrationTracker;
 			packageProductDependencies = (
-				44650CF02F44BE65004FE0CF /* SimpleFramework */,
+				44CEEC802F4D99CA000D5182 /* SimpleFramework */,
+				44E5E0CA2F4DB3330085E706 /* SimpleFramework */,
 			);
 			productName = SimpleHydrationTracker;
 			productReference = 4439FE532F41B973003DB03B /* SimpleHydrationTracker.app */;
@@ -273,7 +276,7 @@
 			mainGroup = 4439FE4A2F41B973003DB03B;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				44650CEF2F44BE65004FE0CF /* XCRemoteSwiftPackageReference "SimpleFramework" */,
+				44E5E0C92F4DB3330085E706 /* XCRemoteSwiftPackageReference "SimpleFramework" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4439FE542F41B973003DB03B /* Products */;
@@ -772,20 +775,24 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		44650CEF2F44BE65004FE0CF /* XCRemoteSwiftPackageReference "SimpleFramework" */ = {
+		44E5E0C92F4DB3330085E706 /* XCRemoteSwiftPackageReference "SimpleFramework" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/davidthorn/SimpleFramework.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.2.0;
+				minimumVersion = 0.7.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		44650CF02F44BE65004FE0CF /* SimpleFramework */ = {
+		44CEEC802F4D99CA000D5182 /* SimpleFramework */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 44650CEF2F44BE65004FE0CF /* XCRemoteSwiftPackageReference "SimpleFramework" */;
+			productName = SimpleFramework;
+		};
+		44E5E0CA2F4DB3330085E706 /* SimpleFramework */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 44E5E0C92F4DB3330085E706 /* XCRemoteSwiftPackageReference "SimpleFramework" */;
 			productName = SimpleFramework;
 		};
 /* End XCSwiftPackageProductDependency section */

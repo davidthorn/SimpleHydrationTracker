@@ -38,7 +38,7 @@ internal struct DataManagementView: View {
                         tint: AppTheme.error
                     )
 
-                    sectionTitle("Export")
+                    SimpleSectionTitleLabel(title: "Export", tint: AppTheme.muted)
                     SimpleInfoActionCard(
                         title: "Prepare Export",
                         subtitle: "Create export output for your hydration records.",
@@ -65,7 +65,7 @@ internal struct DataManagementView: View {
                         )
                     }
 
-                    sectionTitle("Delete")
+                    SimpleSectionTitleLabel(title: "Delete", tint: AppTheme.muted)
                     SimpleInfoActionCard(
                         title: "Delete All Data",
                         subtitle: "Permanently remove hydration entries, goals, and sync data.",
@@ -143,12 +143,6 @@ internal struct DataManagementView: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: showDeleteConfirmation)
-    }
-
-    private func sectionTitle(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.caption.weight(.bold))
-            .foregroundStyle(AppTheme.muted)
     }
 
 }

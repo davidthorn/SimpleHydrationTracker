@@ -28,7 +28,7 @@ internal struct AddCustomAmountView: View {
     internal var body: some View {
         Form {
             Section {
-                TodayHeroCardComponent(
+                SimpleHeroCard(
                     title: "Add Custom Amount",
                     message: "Log any amount for precise daily tracking.",
                     systemImage: "plus.circle.fill",
@@ -39,11 +39,17 @@ internal struct AddCustomAmountView: View {
             }
 
             Section("Amount") {
-                TextField(viewModel.selectedUnit.settingsValueLabel, text: $viewModel.amountText)
-                    .keyboardType(viewModel.selectedUnit == .milliliters ? .numberPad : .decimalPad)
-                Text("Unit: \(viewModel.selectedUnit.shortLabel)")
-                    .font(.caption)
-                    .foregroundStyle(AppTheme.muted)
+                SimpleLabeledTextFieldCard(
+                    numericText: $viewModel.amountText,
+                    title: "Amount",
+                    placeholder: viewModel.selectedUnit.settingsValueLabel,
+                    helperText: "Unit: \(viewModel.selectedUnit.shortLabel)",
+                    tint: AppTheme.accent,
+                    isEnabled: isSaving == false,
+                    allowsDecimalInput: viewModel.selectedUnit == .ounces
+                )
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                .listRowBackground(Color.clear)
             }
 
             Section {
